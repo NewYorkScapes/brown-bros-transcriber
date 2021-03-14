@@ -12,11 +12,15 @@ Progress:
 To Do:
 
  - Handle potential DB locking or problem of concurrent writings to **segments** table.
+ >> Status: Possibly now done by using a checkout field in the segments table so that when a user requests a record, the checkout is immediately set to "1", so that the next user cannot be assigned that record but rather the next available one. 
  - Fix crude method of identifying the next segment needing to be served?
  - Look at adding token boundary GUI
+ >> Status: More or less ready to go. Main bug is that small segments will fail to show the full markup toolbox, which may be confusing to users.
  - Consider using bbox coordinates to generate contextual larger image to accompany segment
- - Work through management, if needed, of batch loading of segments and auto updating DBs to reflect new segments
+ - Work through management, if needed, of batch loading of segments and auto updating DBs to reflect new segments. Possibly deploy a batch loader script here
  - Decide on conventions for segment naming
+ >> Status: Done. This is being done at point of segment generation
+ - Build a export file builder that brings together all the information contained in SQL tables
  
 Non-technical To Do:
 
