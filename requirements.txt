@@ -1,0 +1,4 @@
+flask
+wtf
+flask-login
+email_validator

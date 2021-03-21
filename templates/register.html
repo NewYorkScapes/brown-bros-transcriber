@@ -1,0 +1,22 @@
+{% extends "header.html" %}
+
+{% block content %}
+	<div class = "container">
+		<h2>Register</h2>
+		<br/>
+		{% from "_formhelpers.html" import render_field %}
+		<form method=post action="/register">
+			<dl>
+				{{render_field(form.email)}}
+				{{render_field(form.password)}}
+				{{render_field(form.confirm)}}
+				{{render_field(form.accept_tos)}}
+			</dl>
+			<p><input type=submit value=Register></p>
+		</form>
+        <br/>
+	</div>
+    {% for mesg in get_flashed_messages() %}
+    <div class="alert-errors"><p>{{ mesg }}</p></div>
+  {% endfor %}
+{% endblock %}

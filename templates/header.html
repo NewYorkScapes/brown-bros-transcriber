@@ -9,6 +9,20 @@
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
   </head>
   <body>
+  <h1>Brown Bros Transcriber</h1>
+  <br/><br/>
+  <strong>
+    <nav>
+        <ul class="menu">
+            {% if not current_user.is_authenticated %}
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+            {%  endif %}
+            {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {%  endif %}
+        </ul>
+    </nav>
+</strong>
 {% block content %}
 {% endblock content %}
   </body>

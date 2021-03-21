@@ -1,0 +1,18 @@
+{% extends "header.html" %}
+
+{% block content %}
+{% for mesg in get_flashed_messages() %}
+    <div class="alert-messages"><p>{{ mesg }}</p></div>
+  {% endfor %}
+<div>
+    <h2 class="title">Login</h2>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="POST" action="{{ url_for('login', next='transcriber') }}">
+      <dl>
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+      </dl>
+    <input type=submit value=Login>
+</form>
+</div>
+{% endblock %}
