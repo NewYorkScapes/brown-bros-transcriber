@@ -20,6 +20,9 @@
             {% if current_user.is_authenticated %}
         <li><a href="{{ url_for('logout') }}">Logout</a></li>
             {%  endif %}
+        {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('reset_page') }}">Reset Password</a></li>
+            {%  endif %}
         </ul>
     </nav>
 </strong>

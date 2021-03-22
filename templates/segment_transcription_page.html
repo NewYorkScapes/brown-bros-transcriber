@@ -1,0 +1,18 @@
+{% extends 'header.html' %}
+
+{% block content %}
+{% for mesg in get_flashed_messages() %}
+    <div class="alert-messages"><p>{{ mesg }}</p></div>
+{% endfor %}
+    <br/>
+    <div>
+    <form action="{{ url_for('addrec') }}" method="POST">
+        <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
+        <h2>Enter Transcription</h2>
+         <input type="text" name="segment_transcription" />
+         <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
+         <input type="submit" value="Submit" />
+    </form>
+    </div>
+{% endblock content %}
+

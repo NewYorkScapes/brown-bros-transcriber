@@ -5,10 +5,13 @@ def fetch_new_segment():
         cur = con.cursor()
         cur.execute("""SELECT * FROM segments WHERE number_passes < 3 AND checkout = 0 LIMIT 1""")
         rows = cur.fetchall()
-        filename = rows[0][0]
-        id = rows[0][5]
-        cur.execute("""UPDATE segments SET checkout = 1 WHERE id = ?""", (id,))
-        return filename, id
+        if len(rows) > 0:
+            filename = rows[0][0]
+            id = rows[0][5]
+            cur.execute("""UPDATE segments SET checkout = 1 WHERE id = ?""", (id,))
+            return filename, id
+        return None
+
 
 def record_transcription(transcription, row_num, user_transcriber):
     try:
@@ -54,6 +57,17 @@ def set_user(email, password):
         with sqlite3.connect("transcriptions.db") as con:
             cur = con.cursor()
             cur.execute("""INSERT INTO users (email, password_hash) VALUES (?,?)""",(email, password) )
+            con.commit()
+        return True
+    except:
+        con.rollback()
+        return False
+
+def update_user(email, password):
+    try:
+        with sqlite3.connect("transcriptions.db") as con:
+            cur = con.cursor()
+            cur.execute("""UPDATE users SET password_hash = ? WHERE email = ?""",(password, email) )
             con.commit()
         return True
     except:

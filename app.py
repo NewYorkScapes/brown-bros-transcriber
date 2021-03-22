@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, session, url_for, flash, redi
 from flask_login import LoginManager, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 import os
-from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, retrieve_user, set_user
-from models import LoginForm, RegistrationForm, User
+from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
+    retrieve_user, set_user, update_user
+from models import LoginForm, RegistrationForm, ResetForm, User
 
 app = Flask(__name__)
 app.secret_key = "L2*@AZP3z-/kR4vC4*VCK7JfNr"
@@ -15,11 +16,23 @@ SEGMENT_DIR = os.path.join('static', 'segments')
 
 
 @app.route('/')
+def home():
+    return render_template("home.html")
+
+"""
+TRANSCRIPTION MANAGEMENT ROUTES
+"""
+
+@app.route('/segment')
 @login_required
-def transcriber_home():
-    segment_filename, session['current_row_id'] = fetch_new_segment()
-    current_image = os.path.join(SEGMENT_DIR, segment_filename)
-    return render_template('home.html', image_url = current_image)
+def transcribe_segment():
+    new_segments = fetch_new_segment()
+    if new_segments != None:
+        segment_filename, session['current_row_id'] = new_segments[0], new_segments[1]
+        current_image = os.path.join(SEGMENT_DIR, segment_filename)
+        return render_template('segment_transcription_page.html', image_url = current_image)
+    flash("No segments currently available to transcribe.")
+    return render_template("thanks.html", msg='')
 
 
 @app.route('/addrec',methods = ['POST', 'GET'])
@@ -35,6 +48,9 @@ def addrec():
     return render_template("thanks.html", msg=msg + '. ' + stroke_coords_msg)
     con.close()
 
+"""
+USER MANAGEMENT ROUTES
+"""
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -58,17 +74,16 @@ def register_page():
             add_user = set_user(email, password)
             if add_user:
                 flash("Thanks for registering!")
-                return transcriber_home()
+                return transcribe_segment()
                 con.close()
             else:
                 flash("An error occurred in registering user. Please try again.")
                 return render_template('register.html', form=form)
 
-    return render_template("register.html", form=form, alert=False)
-    con.close()
+    return render_template("register.html", form=form)
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
     if request.method == "POST" and form.validate():
@@ -85,7 +100,7 @@ def login():
                 if next not in ['', 'transcriber']:
                     return abort(400)
                 flash("Logged in successfully.")
-                return transcriber_home()
+                return home()
             else:
                 flash("Incorrect password. Please try again.")
                 return render_template('login.html', form=form)
@@ -108,6 +123,43 @@ def logout():
     logout_user()
     flash("Successfully logged out.")
     return redirect(url_for('login'))
+
+
+@app.route('/reset', methods=["GET", "POST"])
+@login_required
+def reset_page():
+    form = ResetForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        email = form.email.data
+        new_password = generate_password_hash(form.new_password.data)
+
+        user = User(form.email.data)
+        if user:
+            if user.check_password(form.password.data):
+
+                change_user = update_user(email, new_password)
+                if change_user:
+                    flash("Password successfully updated!")
+                    return transcribe_segment()
+                    con.close()
+                else:
+                    flash("An error occurred in updating password. Please try again.")
+                    return render_template('reset.html', form=form)
+                    con.close()
+
+            else:
+                flash("Incorrect password. Please try again.")
+                return render_template('reset.html', form=form)
+                con.close()
+
+        else:
+            flash("Email not found. Please try again.")
+            return render_template('reset.html', form=form)
+            con.close()
+
+    return render_template("reset.html", form=form)
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', debug = True)

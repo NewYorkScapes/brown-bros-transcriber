@@ -21,6 +21,17 @@ class RegistrationForm(Form):
     accept_tos = BooleanField('I have read and understood the website data use policy.', [Required()])
 
 
+class ResetForm(Form):
+    email = TextField('Email Address: ', [Email(message="Please enter a valid email address"), DataRequired()])
+    password = PasswordField('Current Password', [DataRequired()])
+    new_password = PasswordField('New Password: ', [
+        DataRequired(),
+        Length(min=8, message='Password should be at least %(min)d characters long.'),
+        EqualTo('confirm', message='Passwords must match.')
+    ])
+    confirm = PasswordField('Repeat password')
+
+
 class User(UserMixin):
     def __init__(self, email_or_user_id):
         if '@' in email_or_user_id:
