@@ -8,7 +8,7 @@ def fetch_new_segment():
         if len(rows) > 0:
             filename = rows[0][0]
             id = rows[0][5]
-            cur.execute("""UPDATE segments SET checkout = 1 WHERE id = ?""", (id,))
+            cur.execute("""UPDATE segments SET checkout = 1 WHERE segment_id = ?""", (id,))
             return filename, id
         return None
 
@@ -18,7 +18,7 @@ def record_transcription(transcription, row_num, user_transcriber):
         with sqlite3.connect("transcriptions.db") as con:
             cur = con.cursor()
             cur.execute("""INSERT INTO transcriptions (segment_id, transcription, user_transcriber) VALUES (?,?,?)""",(row_num, transcription, user_transcriber) )
-            cur.execute("""UPDATE segments SET number_passes = number_passes + 1, checkout = 0 WHERE id = ?""", (row_num,) )
+            cur.execute("""UPDATE segments SET number_passes = number_passes + 1, checkout = 0 WHERE segment_id = ?""", (row_num,) )
             con.commit()
         return "Record successfully added"
     except:
@@ -44,7 +44,7 @@ def retrieve_user(email=False, user_id=False):
             if not user_id:
                 cur.execute("""SELECT * FROM users WHERE email = ?""", (email,) )
             else:
-                cur.execute("""SELECT * FROM users WHERE id = ?""", (user_id,))
+                cur.execute("""SELECT * FROM users WHERE user_id = ?""", (user_id,))
             rows = cur.fetchall()
         return rows
     except:
