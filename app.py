@@ -5,14 +5,14 @@ import os
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
     retrieve_user, set_user, update_user
 from models import LoginForm, RegistrationForm, ResetForm, User
+from settings import APP_SECRET_KEY, SEGMENT_DIR, DEBUG
 
 app = Flask(__name__)
-app.secret_key = "L2*@AZP3z-/kR4vC4*VCK7JfNr"
+application = app
+app.secret_key = APP_SECRET_KEY
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
-
-SEGMENT_DIR = os.path.join('static', 'segments')
 
 
 @app.route('/')
@@ -141,7 +141,7 @@ def reset_page():
                 change_user = update_user(email, new_password)
                 if change_user:
                     flash("Password successfully updated!")
-                    return transcribe_segment()
+                    return home()
                     con.close()
                 else:
                     flash("An error occurred in updating password. Please try again.")
@@ -162,4 +162,4 @@ def reset_page():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', debug = True)
+    app.run(debug = DEBUG)
