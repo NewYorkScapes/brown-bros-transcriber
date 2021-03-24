@@ -2,10 +2,14 @@ from flask import Flask, render_template, request, session, url_for, flash, redi
 from flask_login import LoginManager, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 import os
-from .utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
+import sys
+
+sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
+
+from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
     retrieve_user, set_user, update_user
-from .models import LoginForm, RegistrationForm, ResetForm, User
-from .settings import APP_SECRET_KEY, SEGMENT_DIR, DEBUG
+from models import LoginForm, RegistrationForm, ResetForm, User
+from settings import APP_SECRET_KEY, SEGMENT_DIR, DEBUG
 
 app = Flask(__name__)
 application = app
