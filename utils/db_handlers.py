@@ -1,13 +1,15 @@
 import sqlite3
+from random import random
 
 def fetch_new_segment():
     with sqlite3.connect("transcriptions.db") as con:
         cur = con.cursor()
-        cur.execute("""SELECT * FROM segments WHERE number_passes < 3 AND checkout = 0 LIMIT 1""")
+        cur.execute("""SELECT * FROM segments WHERE number_passes < 3 AND checkout = 0 LIMIT 10""")
         rows = cur.fetchall()
+        random_row = int(random()*9)
         if len(rows) > 0:
-            filename = rows[0][0]
-            id = rows[0][5]
+            filename = rows[random_row][0]
+            id = rows[random_row][5]
             cur.execute("""UPDATE segments SET checkout = 1 WHERE segment_id = ?""", (id,))
             return filename, id
         return None
