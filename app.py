@@ -94,8 +94,9 @@ def login():
         """
         Normal use of login page to log in using POST method.
         """
-        user = User(form.email.data)
-        if user:
+        try:
+            user = User(form.email.data)
+
             if user.check_password(form.password.data):
                 login_user(user, remember=True)
                 session['user_transcriber'] = user.id
@@ -108,6 +109,14 @@ def login():
             else:
                 flash("Incorrect password. Please try again.")
                 return render_template('login.html', form=form)
+
+        except:
+            """
+            Should happen if user-provided email is not found, indicating a mistype or attempt to login with non-registered user
+            """
+            flash("User not found. Please try again.")
+            return render_template('login.html', form=form)
+
     if request.method == "GET":
         """
         This request occurs when a user logs out; the system redirects to login page again.
