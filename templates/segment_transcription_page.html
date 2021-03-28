@@ -6,8 +6,10 @@
 {% endfor %}
     <br/>
     <div>
+    <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
+    </div>
+    <div>
     <form action="{{ url_for('addrec') }}" method="POST">
-        <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
         <h2>Enter Transcription</h2>
          <input type="text" name="segment_transcription" />
          <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
