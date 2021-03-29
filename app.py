@@ -3,7 +3,6 @@ from flask_login import LoginManager, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 import os
 import sys
-import sqlite3
 
 
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
