@@ -15,25 +15,25 @@ class LoginForm(Form):
 
 
 class RegistrationForm(Form):
-    email = TextField('Email Address: ', [Email(message="Please enter a valid email address"), DataRequired()])
-    password = PasswordField('New Password: ', [
+    email = TextField('Email Address', [Email(message="Please enter a valid email address"), DataRequired()])
+    password = PasswordField('Select a Password', [
         DataRequired(),
         Length(min=8, message='Password should be at least %(min)d characters long.'),
         EqualTo('confirm', message='Passwords must match.')
     ])
-    confirm = PasswordField('Repeat password')
-    accept_tos = BooleanField('I have read and understood the website data use policy.', [Required()])
+    confirm = PasswordField('Repeat Password')
+    accept_tos = BooleanField('I agree to the data use policy.', [Required()])
 
 
 class ResetForm(Form):
-    email = TextField('Email Address: ', [Email(message="Please enter a valid email address"), DataRequired()])
+    email = TextField('Email Address', [Email(message="Please enter a valid email address"), DataRequired()])
     password = PasswordField('Current Password', [DataRequired()])
-    new_password = PasswordField('New Password: ', [
+    new_password = PasswordField('New Password', [
         DataRequired(),
         Length(min=8, message='Password should be at least %(min)d characters long.'),
         EqualTo('confirm', message='Passwords must match.')
     ])
-    confirm = PasswordField('Repeat password')
+    confirm = PasswordField('Repeat Password')
 
 
 class User(UserMixin):
