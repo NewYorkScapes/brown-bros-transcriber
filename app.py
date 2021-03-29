@@ -175,7 +175,7 @@ def reset_page():
 
                 change_user = update_user(email, new_password)
                 if change_user:
-                    flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """)
+                    flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
                     return render_template('reset.html', form=form)
                 else:
                     flash("An error occurred in updating password. Please try again.")
