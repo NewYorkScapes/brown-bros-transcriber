@@ -25,6 +25,11 @@ def home():
     return render_template("home.html")
 
 
+@app.route('/narrative')
+def narrative():
+    return render_template("narrative.html")
+
+
 """
 TRANSCRIPTION MANAGEMENT ROUTES
 """
@@ -68,6 +73,7 @@ def addrec():
                 flash("Error in recording segments separation.")
     return render_template("thanks.html")
 
+
 """
 USER MANAGEMENT ROUTES
 """
@@ -87,7 +93,7 @@ def register_page():
         users_check = retrieve_user(email)
 
         if len(users_check) > 0:
-            flash("That username has already been registered. Select another.")
+            flash("That email address has already been registered. Please log in or select a different email address.")
             return render_template('register.html', form=form, alert=True)
 
         else:
@@ -96,7 +102,7 @@ def register_page():
                 flash("Thanks for registering!")
                 return transcribe_segment()
             else:
-                flash("An error occurred in registering user. Please try again.")
+                flash("An error occurred in registration. Please try again.")
                 return render_template('register.html', form=form)
 
     return render_template("register.html", form=form)
@@ -119,7 +125,6 @@ def login():
                 next = request.args.get('next')
                 if next not in ['', 'transcriber']:
                     return abort(400)
-                flash("Logged in successfully.")
                 return home()
             else:
                 flash("Incorrect password. Please try again.")
@@ -127,7 +132,9 @@ def login():
 
         except:
             """
-            Should happen if user-provided email is not found, indicating a mistype or attempt to login with non-registered user
+            This scenario should happen only if user-provided email is 
+            not found, indicating a mistype or attempt to login with 
+            non-registered user
             """
             flash("User not found. Please try again.")
             return render_template('login.html', form=form)
@@ -141,7 +148,7 @@ def login():
     """
     Some other kind of error in landing on login page. Shouldn't normally happen.
     """
-    flash("An error occurred during log in. Please try again.")
+    flash("An error occurred during login. Please try again.")
     return render_template('login.html', form=form)
 
 
@@ -168,8 +175,8 @@ def reset_page():
 
                 change_user = update_user(email, new_password)
                 if change_user:
-                    flash("Password successfully updated!")
-                    return home()
+                    flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """)
+                    return render_template('reset.html', form=form)
                 else:
                     flash("An error occurred in updating password. Please try again.")
                     return render_template('reset.html', form=form)
