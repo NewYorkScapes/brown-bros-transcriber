@@ -13,14 +13,21 @@
 
                         <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Segment Transcription</h2>
                         <hr class="divider my-4" style="padding-bottom: 1.5rem;" />
+                        <h3 class="text-white mt-0">1. If needed, draw line segments to show divides between words. Click the toolbox's checkmark when done.</h3>
+                        <img id="segment" alt="" src="{{ image_url }}" width="200" onload="showMarkerArea(this);" />
                         {% from "_formhelpers.html" import render_field %}
                     <div>
+                        <h3 class="text-white mt-0">2. Enter transcription:</h3>
                         <form action="{{ url_for('addrec') }}" method="POST">
-                          <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
-                            <h3 class="text-white mt-0">Enter Transcription</h3>
+
                              <input type="text" name="segment_transcription" />
                              <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
-                             <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit" />
+                            <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/>
+                            <input type="checkbox" id="illegible" name="illegible" value="True">
+                             <label for="illegible">Image has text but is mostly illegible.</label><br/>
+                             <input type="checkbox" id="blank" name="blank" value="True">
+                             <label for="blank">Image is blank or does not contain text or numbers.</label>
+                            <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit" />
                         </form>
                     </div>>
                     </div>
