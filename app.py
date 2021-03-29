@@ -3,6 +3,8 @@ from flask_login import LoginManager, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash
 import os
 import sys
+import sqlite3
+
 
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
@@ -23,6 +25,7 @@ login_manager.init_app(app)
 def home():
     return render_template("home.html")
 
+
 """
 TRANSCRIPTION MANAGEMENT ROUTES
 """
@@ -41,16 +44,30 @@ def transcribe_segment():
 
 @app.route('/addrec',methods = ['POST', 'GET'])
 def addrec():
-    msg = record_transcription(request.form['segment_transcription'], session.get('current_row_id', None), session.get('user_transcriber', None))
+    try:
+        if_illegible = 1 if request.form['illegible'] == "True" else 0
+    except:
+        if_illegible = 0
+    try:
+        if_blank = 1 if request.form['blank'] == "True" else 0
+    except:
+        if_blank = 0
+
+    recorded_success = record_transcription(request.form['segment_transcription'], if_illegible, if_blank, session.get('current_row_id', None), session.get('user_transcriber', None))
+    if recorded_success:
+        flash("Response successfully recorded.")
+    else:
+        flash("Error in recording response.")
     list_stroke_coords = request.form['segment_coords'].split('|')[:-1]
     if len(list_stroke_coords):
         for stroke_coords in list_stroke_coords:
             insert_row = tuple([i for i in stroke_coords.split('-')] + [session.get('current_row_id', None),session.get('user_transcriber', None)],)
-            stroke_coords_msg = record_user_strokes(insert_row)
-    else:
-        stroke_coords_msg = "No segments produced."
-    return render_template("thanks.html", msg=msg + '. ' + stroke_coords_msg)
-    con.close()
+            strokes_success = record_user_strokes(insert_row)
+            if strokes_success:
+                flash("Success recording segments separation.")
+            else:
+                flash("Error in recording segments separation.")
+    return render_template("thanks.html")
 
 """
 USER MANAGEMENT ROUTES
@@ -66,7 +83,7 @@ def register_page():
     form = RegistrationForm(request.form)
 
     if request.method == "POST" and form.validate():
-        email = form.email.data
+        email = form.email.data.lower()
         password = generate_password_hash(form.password.data)
         users_check = retrieve_user(email)
 
@@ -79,7 +96,6 @@ def register_page():
             if add_user:
                 flash("Thanks for registering!")
                 return transcribe_segment()
-                con.close()
             else:
                 flash("An error occurred in registering user. Please try again.")
                 return render_template('register.html', form=form)
@@ -95,7 +111,7 @@ def login():
         Normal use of login page to log in using POST method.
         """
         try:
-            user = User(form.email.data)
+            user = User(form.email.data.lower())
 
             if user.check_password(form.password.data):
                 login_user(user, remember=True)
@@ -144,10 +160,10 @@ def reset_page():
     form = ResetForm(request.form)
 
     if request.method == "POST" and form.validate():
-        email = form.email.data
+        email = form.email.data.lower()
         new_password = generate_password_hash(form.new_password.data)
 
-        user = User(form.email.data)
+        user = User(email)
         if user:
             if user.check_password(form.password.data):
 
@@ -155,21 +171,17 @@ def reset_page():
                 if change_user:
                     flash("Password successfully updated!")
                     return home()
-                    con.close()
                 else:
                     flash("An error occurred in updating password. Please try again.")
                     return render_template('reset.html', form=form)
-                    con.close()
 
             else:
                 flash("Incorrect password. Please try again.")
                 return render_template('reset.html', form=form)
-                con.close()
 
         else:
             flash("Email not found. Please try again.")
             return render_template('reset.html', form=form)
-            con.close()
 
     return render_template("reset.html", form=form)
 

@@ -5,14 +5,21 @@
     <div class="alert-messages"><p>{{ mesg }}</p></div>
 {% endfor %}
     <br/>
+    <h2>Set one or more segments dividing word tokens, if needed. Click on the check button when done.</h2>
+    <br/><br/>
     <div>
-    <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
+    <img id="segment" alt="" src="{{ image_url }}" width="200" onload="showMarkerArea(this);" />
     </div>
     <div>
     <form action="{{ url_for('addrec') }}" method="POST">
-        <h2>Enter Transcription</h2>
+        <h2>Enter Transcription: </h2>
          <input type="text" name="segment_transcription" />
          <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
+         <h2>or click one of the following:</h2>
+         <input type="checkbox" id="illegible" name="illegible" value="True">
+         <label for="illegible">Image has text but is mostly illegible.</label><br>
+         <input type="checkbox" id="blank" name="blank" value="True">
+         <label for="blank">Image is blank or does not contain text or numbers.</label><br>
          <input type="submit" value="Submit" />
     </form>
     </div>

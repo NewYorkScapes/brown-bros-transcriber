@@ -4,28 +4,28 @@ from random import random
 def fetch_new_segment():
     with sqlite3.connect("transcriptions.db") as con:
         cur = con.cursor()
-        cur.execute("""SELECT * FROM segments WHERE number_passes < 3 AND checkout = 0 LIMIT 10""")
+        cur.execute("""SELECT * FROM segments WHERE number_passes < 3 LIMIT 10""")
         rows = cur.fetchall()
         random_row = int(random()*9)
         if len(rows) > 0:
-            filename = rows[random_row][0]
-            id = rows[random_row][5]
-            cur.execute("""UPDATE segments SET checkout = 1 WHERE segment_id = ?""", (id,))
-            return filename, id
+            return rows[random_row][0], rows[random_row][5]
         return None
 
 
-def record_transcription(transcription, row_num, user_transcriber):
+def record_transcription(transcription, if_illegible, if_blank, row_num, user_transcriber):
     try:
         with sqlite3.connect("transcriptions.db") as con:
             cur = con.cursor()
-            cur.execute("""INSERT INTO transcriptions (segment_id, transcription, user_transcriber) VALUES (?,?,?)""",(row_num, transcription, user_transcriber) )
-            cur.execute("""UPDATE segments SET number_passes = number_passes + 1, checkout = 0 WHERE segment_id = ?""", (row_num,) )
+            cur.execute("""INSERT INTO transcriptions (segment_id, 
+                          transcription, user_transcriber, 
+                          marked_illegible, marked_blank) VALUES (?,?,?,?,?)""",(row_num, transcription, user_transcriber, if_illegible, if_blank) )
+            cur.execute("""UPDATE segments SET number_passes = number_passes + 1 WHERE segment_id = ?""", (row_num,) )
             con.commit()
-        return "Record successfully added"
+        return True
     except:
         con.rollback()
-        return "Error in insert operation"
+        return False
+
 
 def record_user_strokes(id_plus_coords):
     try:
@@ -33,10 +33,10 @@ def record_user_strokes(id_plus_coords):
             cur = con.cursor()
             cur.execute("""INSERT INTO user_stroke_coordinates (x1_coord, y1_coord, x2_coord, y2_coord, segment_id, user_transcriber) VALUES (?,?,?,?,?,?)""",(id_plus_coords) )
             con.commit()
-        return "User-provided stroke segments added to database."
+        return True
     except:
         con.rollback()
-        return "Error in insert operation"
+        return False
 
 
 def retrieve_user(email=False, user_id=False):
@@ -51,7 +51,7 @@ def retrieve_user(email=False, user_id=False):
         return rows
     except:
         con.rollback()
-        return "Error in insert operation"
+        return False
 
 
 def set_user(email, password):

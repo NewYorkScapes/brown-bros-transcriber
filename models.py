@@ -5,6 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from utils.db_handlers import retrieve_user
 
 
+"""
+Login/User Classes
+"""
+
 class LoginForm(Form):
     email = StringField('Email', [Email(message="Please enter a valid email address."), DataRequired(), Length(max=120)])
     password = PasswordField('Password', [DataRequired()])
