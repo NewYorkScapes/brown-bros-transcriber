@@ -1,11 +1,24 @@
 {% extends 'header.html' %}
 {% block content %}
-    <h2>Thanks!</h2>
-{% for mesg in get_flashed_messages() %}
-    <div class="alert-messages"><p>{{ mesg }}</p></div>
-{% endfor %}
-    <div>
-    <p><a href="{{ url_for('transcribe_segment') }}">Try another?</a></p>
-    <p><a href="{{ url_for('home') }}">Stop and return home.</a></p>
-    </div>
+
+     <section class="page-section bg-primary" style="height:90%">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+
+                        {% for mesg in get_flashed_messages() %}
+                        <div class="alert-messages"><p>{{ mesg }}</p></div>
+                        {% endfor %}
+
+                        <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Thanks!</h2>
+                        <h3 class="text-white mt-0">{{ msg }}</h3>
+
+                        <p><a class="btn btn-light btn-medium js-scroll-trigger" href="{{ url_for('transcribe_segment') }}">Try Another</a></p>
+                        <p><a class="btn btn-light btn-medium js-scroll-trigger" href="{{ url_for('home') }}">Return Home</a></p>
+
+                    </div>
+                </div>
+            </div>
+     </section>
+
 {% endblock content %}

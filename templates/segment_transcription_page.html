@@ -1,27 +1,48 @@
 {% extends 'header.html' %}
 
 {% block content %}
-{% for mesg in get_flashed_messages() %}
-    <div class="alert-messages"><p>{{ mesg }}</p></div>
-{% endfor %}
-    <br/>
-    <h2>Set one or more segments dividing word tokens, if needed. Click on the check button when done.</h2>
-    <br/><br/>
-    <div>
-    <img id="segment" alt="" src="{{ image_url }}" width="200" onload="showMarkerArea(this);" />
-    </div>
-    <div>
-    <form action="{{ url_for('addrec') }}" method="POST">
-        <h2>Enter Transcription: </h2>
-         <input type="text" name="segment_transcription" />
-         <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
-         <h2>or click one of the following:</h2>
-         <input type="checkbox" id="illegible" name="illegible" value="True">
-         <label for="illegible">Image has text but is mostly illegible.</label><br>
-         <input type="checkbox" id="blank" name="blank" value="True">
-         <label for="blank">Image is blank or does not contain text or numbers.</label><br>
-         <input type="submit" value="Submit" />
-    </form>
-    </div>
-{% endblock content %}
 
+     <section class="page-section bg-primary" id="about">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+
+                        {% for mesg in get_flashed_messages() %}
+                        <div class="alert-messages"><p>{{ mesg }}</p></div>
+                        {% endfor %}
+
+                        <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Segment Transcription</h2>
+                        <hr class="divider my-4" style="padding-bottom: 1.5rem;" />
+                        {% from "_formhelpers.html" import render_field %}
+                    <div>
+                        <form action="{{ url_for('addrec') }}" method="POST">
+                          <img id="segment" alt="" src="{{ image_url }}" onload="showMarkerArea(this);" />
+                            <h3 class="text-white mt-0">Enter Transcription</h3>
+                             <input type="text" name="segment_transcription" />
+                             <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
+                             <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit" />
+                        </form>
+                    </div>>
+                    </div>
+                </div>
+            </div>
+     </section>
+    <section class="page-section bg-tertiary">
+        <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h5 class="mt-0" style="padding-bottom: 1rem;">A Note on Content</h5>
+                        <p style="font-size: .9rem;">The materials available for transcription belong to a collection of 19th-century
+                            ledgers from the New York Public Library’s Brown Brothers & Company Records.
+                            Because Brown Brothers & Co. was involved in the linen and cotton trades, transatlantic shipping,
+                            and the plantation economy, transcribers may encounter content related to the sale and trade of human
+                            beings and violence against enslaved people and laborers. For more on why we’re transcribing these
+                            materials, please see <a style="color: #1D1C1C;" href="{{ url_for('narrative') }}">“Why Transcribe?”</a></p>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+
+    </section>
+
+{% endblock content %}
