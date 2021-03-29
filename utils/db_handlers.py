@@ -65,6 +65,7 @@ def set_user(email, password):
         con.rollback()
         return False
 
+
 def update_user(email, password):
     try:
         with sqlite3.connect("transcriptions.db") as con:
