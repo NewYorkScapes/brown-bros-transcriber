@@ -1,7 +1,6 @@
 {% extends 'header.html' %}
 
 {% block content %}
-
      <section class="page-section bg-primary" id="about">
             <div class="container">
                 <div class="row justify-content-center">
@@ -12,24 +11,38 @@
                         {% endfor %}
 
                         <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Segment Transcription</h2>
-                        <hr class="divider my-4" style="padding-bottom: 1.5rem;" />
-                        <h3 class="text-white mt-0">1. If needed, draw line segments to show divides between words. Click the toolbox's checkmark when done.</h3>
-                        <img id="segment" alt="" src="{{ image_url }}" width="200" onload="showMarkerArea(this);" />
-                        {% from "_formhelpers.html" import render_field %}
+                        <hr class="divider my-4" style="padding-bottom: 1.5rem;" /><br/><br/><br/>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center">
                     <div>
-                        <h3 class="text-white mt-0">2. Enter transcription:</h3>
+                        <img id="segment" onload="showMarkerArea(this);" alt="A single image segment to be transcribed." src="{{ image_url }}" width="200" /><br/><br/>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <a data-toggle="modal" href="#myModal">View Segment in Context</a><br/><br/><br/>
+                        <h3 class="text-white mt-0">1. If needed, draw line segments between words.</h3>
+                        <p class="text-white mt-0">Click the segment symbol in the toolbox above the image to draw.</p>
+                        <p class="text-white mt-0">Click checkmark when done.</p><br/><br/>
+                        {% from "_formhelpers.html" import render_field %}
+
+                        <h3 class="text-white mt-0">2. Enter transcription:</h3><br/><br/>
                         <form action="{{ url_for('addrec') }}" method="POST">
 
-                             <input type="text" name="segment_transcription" />
+                             <input type="text" name="segment_transcription" /><br/><br/>
                              <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
-                            <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/>
+                            <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/><br/>
                             <input type="checkbox" id="illegible" name="illegible" value="True">
-                             <label for="illegible">Image has text but is mostly illegible.</label><br/>
+                             <label style="color: white;" for="illegible">Image has text but is mostly illegible.</label><br/><br/>
                              <input type="checkbox" id="blank" name="blank" value="True">
-                             <label for="blank">Image is blank or does not contain text or numbers.</label>
+                            <label style="color: white;" for="blank">Image is blank or does not contain text or numbers.</label><br/>
                             <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit" />
                         </form>
-                    </div>>
                     </div>
                 </div>
             </div>
@@ -44,13 +57,25 @@
                             Because Brown Brothers & Co. was involved in the linen and cotton trades, transatlantic shipping,
                             and the plantation economy, transcribers may encounter content related to the sale and trade of human
                             beings and violence against enslaved people and laborers. For more on why we’re transcribing these
-                            materials, please see <a style="color: #1D1C1C;" href="{{ url_for('narrative') }}">“Why Transcribe?”</a></p>
+                            materials, please see <a style="color: #1D1C1C; text-decoration: underline;" href="{{ url_for('narrative') }}">“Why Transcribe?”</a></p>
                         <p></p>
                     </div>
                 </div>
             </div>
 
     </section>
+
+
+<!-- Context Image Popup -->
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <img src="{{ image_url }}" class="img-responsive">
+        </div>
+    </div>
+  </div>
+</div>
 
 {% include "footer.html" %}
 {% endblock content %}

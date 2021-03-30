@@ -13,7 +13,7 @@ from models import LoginForm, RegistrationForm, ResetForm, User
 from settings import APP_SECRET_KEY, SEGMENT_DIR, DEBUG
 
 app = Flask(__name__)
-application = app
+#application = app
 app.secret_key = APP_SECRET_KEY
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -190,6 +190,13 @@ def reset_page():
             return render_template('reset.html', form=form)
 
     return render_template("reset.html", form=form)
+
+
+@app.route('/profile', methods=["GET"])
+@login_required
+def profile():
+    email = User(session.get('user_transcriber', None)).email
+    return render_template("profile.html", account_email=email)
 
 
 if __name__ == '__main__':
