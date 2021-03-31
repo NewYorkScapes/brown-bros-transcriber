@@ -10,7 +10,7 @@ sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
     retrieve_user, set_user, update_user
 from models import LoginForm, RegistrationForm, ResetForm, User
-from settings import APP_SECRET_KEY, SEGMENT_DIR, DEBUG
+from settings import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG
 
 app = Flask(__name__)
 #application = app
@@ -39,11 +39,12 @@ TRANSCRIPTION MANAGEMENT ROUTES
 def transcribe_segment():
     new_segments = fetch_new_segment()
     if new_segments != None:
-        segment_filename, session['current_row_id'] = new_segments[0], new_segments[1]
+        segment_filename, session['current_row_id'], context_filename = new_segments[0], new_segments[1], new_segments[2]
         current_image = os.path.join(SEGMENT_DIR, segment_filename)
-        return render_template('segment_transcription_page.html', image_url = current_image)
+        context_image = os.path.join(CONTEXT_DIR, context_filename)
+        return render_template('segment_transcription_page.html', image_url = current_image, context_url = context_image)
     flash("No segments currently available to transcribe.")
-    return render_template("thanks.html", msg='')
+    return render_template("thanks.html")
 
 
 @app.route('/addrec',methods = ['POST', 'GET'])
@@ -57,7 +58,10 @@ def addrec():
     except:
         if_blank = 0
 
-    recorded_success = record_transcription(request.form['segment_transcription'], if_illegible, if_blank, session.get('current_row_id', None), session.get('user_transcriber', None))
+    recorded_success = record_transcription(request.form['segment_transcription'],
+                                    if_illegible, if_blank,
+                                    session.get('current_row_id', None),
+                                    session.get('user_transcriber', None))
     if recorded_success:
         flash("Response successfully recorded.")
     else:
