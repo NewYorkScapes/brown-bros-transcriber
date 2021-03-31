@@ -13,7 +13,7 @@ from models import LoginForm, RegistrationForm, ResetForm, User
 from settings import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG
 
 app = Flask(__name__)
-#application = app
+application = app
 app.secret_key = APP_SECRET_KEY
 login_manager = LoginManager()
 login_manager.login_view = 'login'
