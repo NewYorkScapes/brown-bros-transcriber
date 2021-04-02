@@ -24,12 +24,12 @@ login_manager.init_app(app)
 def home():
     return render_template("home.html")
 
-
+  
 @app.route('/narrative')
 def narrative():
     return render_template("narrative.html")
 
-
+  
 """
 TRANSCRIPTION MANAGEMENT ROUTES
 """
@@ -181,6 +181,7 @@ def reset_page():
                 if change_user:
                     flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
                     return render_template('reset.html', form=form)
+
                 else:
                     flash("An error occurred in updating password. Please try again.")
                     return render_template('reset.html', form=form)

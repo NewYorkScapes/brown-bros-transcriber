@@ -48,6 +48,7 @@
                         {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('profile') }}">Account Info</a></li>
                         {%  endif %}
+
                     </ul>
                 </div>
             </div>
@@ -57,5 +58,3 @@
 
 {% block content %}
 {% endblock content %}
-
-
