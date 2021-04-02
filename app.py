@@ -10,7 +10,7 @@ sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
     retrieve_user, set_user, update_user
 from models import LoginForm, RegistrationForm, ResetForm, User
-from settings import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG
+from settings_local import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG
 
 app = Flask(__name__)
 application = app

@@ -5,5 +5,3 @@ transcriptions.db
 README.md
 brownBros_db_schema.png
 passenger.log
-static/segments/**
-static/contexts/**
