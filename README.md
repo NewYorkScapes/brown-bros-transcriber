@@ -4,7 +4,7 @@ A proof-of-concept Flask app to handle transcriptions of segments and identifyin
 
 **Run/Install**
  
- <code>https://github.com/NewYorkScapes/brown-bros-transcriber.git</code>
+ <code>git clone https://github.com/NewYorkScapes/brown-bros-transcriber.git</code>
  
  <code>cd brown-bros-transcriber</code>
  
