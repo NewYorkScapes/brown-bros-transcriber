@@ -26,9 +26,9 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-8 text-center">
                         <a data-toggle="modal" href="#myModal">View Segment in Context</a><br/><br/><br/>
-                        <h3 class="text-white mt-0">1. If needed, draw line segments between words.</h3>
-                        <p class="text-white mt-0">Click the segment symbol in the toolbox above the image to draw.</p>
-                        <p class="text-white mt-0">Click checkmark when done.</p><br/><br/>
+                        <h3 class="text-white mt-0">1. If needed, draw line segments to separate words.</h3>
+                        <p class="text-white mt-0">Click the segment symbol (&mdash;) in the toolbox above for each line you wish to draw.</p>
+                        <p class="text-white mt-0">Click checkmark (&#10003;) when done.</p><br/><br/>
                         {% from "_formhelpers.html" import render_field %}
 
                         <h3 class="text-white mt-0">2. Enter transcription:</h3><br/><br/>
@@ -71,8 +71,16 @@
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
+
+        <div class="modal-header">
+        <h5>Page Context</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+
         <div class="modal-body">
-            <img src="{{ context_url }}" class="img-responsive">
+            <img src="{{ context_url }}" class="img-responsive" style="align: center; max-width:100%;">
         </div>
     </div>
   </div>
