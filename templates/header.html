@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <title>Brown Brothers Collection Transcriber</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Markup JS handler -->
     <script type="text/javascript" src="https://unpkg.com/markerjs2/markerjs2.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='markup_handler.js')}}"></script>
-
 
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="../static/assets/img/favicon.ico" />
@@ -25,33 +25,14 @@
 
   </head>
   <body id="page-top">
-  <!--<h1>Brown Bros Transcriber</h1>
-  <br/><br/>-->
-
- <!--   <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
-    <div class="container">
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-    <div class="collapse navbar-collapse" id="navbarResponsive">
-    <ul class="navbar-nav ml-auto my-2 my-lg-0">
-            {#% if not current_user.is_authenticated %#}
-        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('login') }}">Login</a></li>
-            {#%  endif %#}
-            {#% if current_user.is_authenticated %#}
-        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('logout') }}">Logout</a></li>
-            {#%  endif %#}
-        {#% if current_user.is_authenticated %#}
-        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('reset_page') }}">Reset Password</a></li>
-            {#%  endif %#}
-    </ul>
-    </div>
-    </div>
-    </nav>-->
 
   <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
             <div class="container">
                 <a class="navbar-brand js-scroll-trigger" href="{{ url_for('home') }}">Brown Brothers Transcriber</a>
+
                 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="menu navbar-nav ml-auto my-2 my-lg-0">
                         {% if not current_user.is_authenticated %}
@@ -61,12 +42,13 @@
                         {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger" href="{{ url_for('logout') }}">Sign Out</a></li>
                         {%  endif %}
-                        {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('reset_page') }}">Reset Password</a></li>
-                        {%  endif %}
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="https://newyorkscapes.org/brownbrothers/" target="_blank">About the Project</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('narrative') }}">Why Transcribe?</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="mailto:info@newyorkscapes.org">Contact Us</a></li>
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('profile') }}">Account Info</a></li>
+                        {%  endif %}
+
                     </ul>
                 </div>
             </div>
@@ -76,20 +58,3 @@
 
 {% block content %}
 {% endblock content %}
-
-
-  <!-- Footer-->
-    <footer class="bg-light py-5">
-        <div class="container"><div class="small text-center text-muted">Copyright © 2021 - NewYorkScapes & Brown Brothers Collection Project</div></div>
-    </footer>
-    <!-- Bootstrap core JS-->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Third party plugin JS-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="../static/bootstrap-scripts.js"></script>
-
-  </body>
-</html>

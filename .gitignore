@@ -1,3 +1,9 @@
 /.idea
+settings.py
+references-how-to.txt
 transcriptions.db
-/static/segments
+README.md
+brownBros_db_schema.png
+passenger.log
+static/segments/**
+static/contexts/**

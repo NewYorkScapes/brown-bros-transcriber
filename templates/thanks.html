@@ -11,7 +11,6 @@
                         {% endfor %}
 
                         <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Thanks!</h2>
-                        <h3 class="text-white mt-0">{{ msg }}</h3>
 
                         <p><a class="btn btn-light btn-medium js-scroll-trigger" href="{{ url_for('transcribe_segment') }}">Try Another</a></p>
                         <p><a class="btn btn-light btn-medium js-scroll-trigger" href="{{ url_for('home') }}">Return Home</a></p>
@@ -20,5 +19,5 @@
                 </div>
             </div>
      </section>
-
+{% include "footer.html" %}
 {% endblock content %}

@@ -2,6 +2,7 @@
 
 {% block content %}
 
+
      <section class="page-section bg-primary" id="about">
             <div class="container">
                 <div class="row justify-content-center">
@@ -29,22 +30,6 @@
             </div>
      </section>
 
-    <section class="page-section bg-tertiary">
-        <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8 text-center">
-                        <h5 class="mt-0" style="padding-bottom: 1rem;">A Note on Content</h5>
-                        <p style="font-size: .9rem;">The materials available for transcription belong to a collection of 19th-century
-                            ledgers from the New York Public Library’s Brown Brothers & Company Records.
-                            Because Brown Brothers & Co. was involved in the linen and cotton trades, transatlantic shipping,
-                            and the plantation economy, transcribers may encounter content related to the sale and trade of human
-                            beings and violence against enslaved people and laborers. For more on why we’re transcribing these
-                            materials, please see <a style="color: #1D1C1C;" href="{{ url_for('narrative') }}">“Why Transcribe?”</a></p>
-                        <p></p>
-                    </div>
-                </div>
-            </div>
-
-    </section>
+{% include "footer.html" %}
 
 {% endblock %}
