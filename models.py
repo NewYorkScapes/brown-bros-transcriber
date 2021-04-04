@@ -10,8 +10,12 @@ Login/User Classes
 """
 
 class LoginForm(Form):
-    email = StringField('Email', [Email(message="Please enter a valid email address."), DataRequired(), Length(max=120)])
+    email = TextField('Email', [Email(message="Please enter a valid email address."), DataRequired()])
     password = PasswordField('Password', [DataRequired()])
+
+
+class ResetRequestForm(Form):
+    email = TextField('Email', [Email(message="Please enter the email address associated with your account. If it matches one in our system, a reset email will be sent."), DataRequired()])
 
 
 class RegistrationForm(Form):
@@ -28,6 +32,15 @@ class RegistrationForm(Form):
 class ResetForm(Form):
     email = TextField('Email Address', [Email(message="Please enter a valid email address"), DataRequired()])
     password = PasswordField('Current Password', [DataRequired()])
+    new_password = PasswordField('New Password', [
+        DataRequired(),
+        Length(min=8, message='Password should be at least %(min)d characters long.'),
+        EqualTo('confirm', message='Passwords must match.')
+    ])
+    confirm = PasswordField('Repeat Password')
+
+
+class ResetFormForgot(Form):
     new_password = PasswordField('New Password', [
         DataRequired(),
         Length(min=8, message='Password should be at least %(min)d characters long.'),
