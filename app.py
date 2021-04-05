@@ -14,7 +14,7 @@ from utils.emailer import send_reset_email, build_reset_pw
 from models import LoginForm, RegistrationForm, ResetForm, User, \
     ResetRequestForm, ResetFormForgot
 from settings import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG, \
-                    MAIL_SERVER, MAIL_PORT, MAIL_USE_SSL, MAIL_USERNAME,\
+                    MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USERNAME,\
                     MAIL_PASSWORD
 
 app = Flask(__name__)
@@ -25,7 +25,7 @@ login_manager.login_view = 'login'
 login_manager.init_app(app)
 app.config['MAIL_SERVER'] = MAIL_SERVER
 app.config['MAIL_PORT'] = MAIL_PORT
-app.config['MAIL_USE_SSL'] = MAIL_USE_SSL
+app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
 app.config['MAIL_USERNAME'] = MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 mail = Mail(app)
