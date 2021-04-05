@@ -1,3 +1,5 @@
+//* An implementation of a code provided by Mamum (https://stackoverflow.com/users/3980225/mamun) at https://stackoverflow.com/questions/37018463/add-a-string-of-text-into-an-input-field-when-user-clicks-a-button-at-cursor-lo *//
+
 function insertSpecial(areaId, text) {
         var txtarea = document.getElementById(areaId);
         var scrollPos = txtarea.scrollTop;
