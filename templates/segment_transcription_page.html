@@ -31,10 +31,17 @@
                         <p class="text-white mt-0">Click checkmark (&#10003;) when done.</p><br/><br/>
                         {% from "_formhelpers.html" import render_field %}
 
-                        <h3 class="text-white mt-0">2. Enter transcription:</h3><br/><br/>
+                        <h3 class="text-white mt-0">2. Enter transcription:</h3>
+                        <p class="text-white mt-0">If a special character is needed, click to insert:</p>
+                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '½')" value="½" id="specialbutton" />
+                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '%')" value="%" id="specialbutton" />
+                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¼')" value="¼" id="specialbutton" />
+                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '£')" value="£" id="specialbutton" />
+                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¢')" value="¢" id="specialbutton" />
+                        <br/><br/>
                         <form action="{{ url_for('addrec') }}" method="POST">
 
-                             <input type="text" name="segment_transcription" /><br/><br/>
+                             <input type="text" name="segment_transcription" id="text"/><br/><br/><br/>
                              <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
                             <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/><br/>
                             <input type="checkbox" id="illegible" name="illegible" value="True">
