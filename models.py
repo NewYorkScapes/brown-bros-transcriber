@@ -1,3 +1,4 @@
+from flask import Markup
 from flask_login import UserMixin
 from wtforms import Form, BooleanField, TextField, StringField, PasswordField, SubmitField
 from wtforms.validators import Required, DataRequired, Email, EqualTo, Length
@@ -26,7 +27,7 @@ class RegistrationForm(Form):
         EqualTo('confirm', message='Passwords must match.')
     ])
     confirm = PasswordField('Repeat Password')
-    accept_tos = BooleanField('I agree to the data use policy.', [Required()])
+    accept_tos = BooleanField(Markup('I agree to the <a data-toggle="modal" href="#data_use_Modal">data use policy</a>.'), [Required()])
 
 
 class ResetForm(Form):

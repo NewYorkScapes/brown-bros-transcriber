@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, session, url_for, flash, redi
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_mail import Mail
 from werkzeug.security import generate_password_hash
-from werkzeug.datastructures import MultiDict
 import os
 import sys
 
@@ -10,7 +9,7 @@ import sys
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
-    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw
+    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw, check_unique_token
 from utils.emailer import send_reset_email, build_reset_pw
 from models import LoginForm, RegistrationForm, ResetForm, User, \
     ResetRequestForm, ResetFormForgot
@@ -115,8 +114,10 @@ def register_page():
         else:
             add_user = set_user(email, password)
             if add_user:
-                flash("Thanks for registering!")
-                return transcribe_segment()
+                flash(Markup(
+                    """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                    'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                return render_template('general_use_template.html', title_text="Thanks for registering!")
             else:
                 flash("An error occurred in registration. Please try again.")
                 return render_template('register.html', form=form)
@@ -141,7 +142,10 @@ def login():
                 next = request.args.get('next')
                 if next not in ['', 'transcriber']:
                     return abort(400)
-                return home()
+                flash(Markup(
+                    """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                    'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                return render_template('general_use_template.html', title_text = "Login successful!" )
             else:
                 flash("Incorrect password. Please try again.")
                 return render_template('login.html', form=form)
@@ -191,8 +195,8 @@ def reset_page():
 
                 change_user = update_user(email, new_password)
                 if change_user:
-                    flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
-                    return render_template('reset.html', form=form)
+                    flash(Markup    ("""<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                    return render_template('general_use_template.html', title_text="Password succesfully updated!")
 
                 else:
                     flash("An error occurred in updating password. Please try again.")
@@ -224,13 +228,13 @@ def forgot_password():
         email = form.email.data.lower()
 
         if retrieve_user(email=email) != False:
-            temp_pw, expire_date = build_reset_pw()
-            if set_reset_pw(email, generate_password_hash(temp_pw), expire_date, 0):
-                send_reset_email(email, temp_pw, mail)
+            temp_pw, expire_date, unique_token = build_reset_pw()
+            if set_reset_pw(email, generate_password_hash(temp_pw), expire_date, 0, unique_token):
+                send_reset_email(email, temp_pw, mail, unique_token)
                 flash("A temporary password has been sent to your email address. Please check your email and enter the password below.")
-                return redirect(url_for('forgot_password_check', reset_email = email))
+                return redirect(url_for('forgot_password_check', reset_email=email, next=unique_token))
             else:
-                flash("An error occurred in resetting password. Please try again.")
+                flash("An error occurred in sending a temporary password. Please try again.")
                 return render_template('forgot_password.html', form=form)
         else:
            flash("Email not found. Please try again.")
@@ -243,49 +247,61 @@ def forgot_password():
 def forgot_password_check():
     try:
         in_email = request.args.get('reset_email').replace('%40','@')
+        sent_unique_token = request.args.get('next')
+        let_pass = check_unique_token(in_email, sent_unique_token)
     except:
-        in_email = ''
+        flash("A password reset is not available.")
+        return render_template('general_use_template.html', title_text="Error in resetting password.")
     form = LoginForm(request.form, email=in_email)
 
-    if request.method == "POST":
+    if request.method == "POST" and let_pass == True:
         user_email = form.email.data.lower()
         message = check_reset_pw(user_email, form.password.data)
         if message == True:
-            if request.args.get('next') == 'forgot':
-                return redirect(url_for('reset_forgot', next='setnew', email=user_email))
-            else:
-                flash("An error occurred in resetting password. Please try again.")
-                return redirect(url_for('forgot_password'))
+            return redirect(url_for('reset_forgot', next=sent_unique_token, reset_email=user_email))
+
         else:
             flash(message)
+            if "incorrect" in message:
+                return redirect(url_for('forgot_password_check', next=sent_unique_token, reset_email=user_email))
             return redirect(url_for('forgot_password'))
 
-    return render_template('temp_reset_login.html', form=form)
+    """
+    Initial arrival at reset password site. Since this page is not login/password protected, we don't allow anyone to direct access the page as a GET
+    without having the correct unique_token attached to the user's email's reset password. 
+    """
+    if let_pass:
+        return render_template('temp_reset_login.html', form=form, next=sent_unique_token, reset_email=in_email)
 
 
 @app.route('/reset_forgot', methods=['GET', 'POST'])
 def reset_forgot():
-    form = ResetFormForgot(request.form)
     try:
-        user_email = request.args.get('email').replace('%40', '@')
+        in_email = request.args.get('reset_email').replace('%40','@')
+        sent_unique_token = request.args.get('next')
+        let_pass = check_unique_token(in_email, sent_unique_token)
     except:
-        user_email = ''
+        flash("Password reset was not successful. Please try again.")
+        return render_template('general_use_template.html', title_text="Error in resetting password.")
 
-    if request.method == "POST" and form.validate() and request.args.get('next') == "setnew":
+    form = ResetFormForgot(request.form)
+
+
+    if request.method == "POST" and form.validate():
         new_password = generate_password_hash(form.new_password.data)
-        change_user = update_user(user_email, new_password)
+        change_user = update_user(in_email, new_password)
         if change_user:
             flash(Markup(
-                """Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
                 'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
-            return render_template('home.html')
+            return render_template('general_use_template.html', title_text = "Password succesfully updated!")
 
         else:
             flash("An error occurred in updating password. Please try again.")
-            return render_template('reset_forgot.html', form=form, email=user_email, next="setnew")
+            return render_template('reset_forgot.html', form=form, reset_email=user_email, next=sent_unique_token)
 
-    if request.args.get('next') == "setnew":
-        return render_template('reset_forgot.html', form=form, email=user_email, next="setnew")
+    if let_pass:
+        return render_template('reset_forgot.html', form=form, reset_email=in_email, next=sent_unique_token)
 
     else:
         return abort(400)

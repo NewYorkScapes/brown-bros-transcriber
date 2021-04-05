@@ -9,7 +9,7 @@
                         <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Reset Password</h2>
                         <hr class="divider my-4" style="padding-bottom: 1.5rem;" />
                         {% from "_formhelpers.html" import render_field %}
-                        <form method=post action="/reset_forgot?next=setnew">
+                        <form method=post action="{{ url_for('reset_forgot', next=next, reset_email=reset_email) }}">
                           <dl class="labels">
 				            {{render_field(form.new_password)}}
                               <br/>
