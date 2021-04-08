@@ -1,4 +1,6 @@
 import sqlite3
+import io
+import csv
 from random import random
 from settings import DB
 from werkzeug.security import check_password_hash
@@ -58,11 +60,11 @@ def retrieve_user(email=False, user_id=False):
         return False
 
 
-def set_user(email, password):
+def set_user(email, password, access):
     try:
         with sqlite3.connect(DB) as con:
             cur = con.cursor()
-            cur.execute("""INSERT INTO users (email, password_hash) VALUES (?,?)""",(email, password) )
+            cur.execute("""INSERT INTO users (email, password_hash, if_admin) VALUES (?,?,?)""",(email, password, access) )
             con.commit()
         return True
     except:
@@ -130,3 +132,43 @@ def check_reset_pw(user_email, temp_pw):
             return "No temporary password was set or it has already been used. Please request a password reset again."
 
 
+def make_report():
+    with sqlite3.connect(DB) as con:
+        cur = con.cursor()
+        cur.execute("""SELECT number_passes, COUNT(*) FROM segments GROUP BY number_passes""")
+        seg_passes = cur.fetchall()
+        cur.execute("""SELECT year, COUNT(*) FROM segments GROUP BY year""")
+        year_counts = cur.fetchall()
+        cur.execute("""SELECT user_transcriber, COUNT(*) FROM transcriptions GROUP BY user_transcriber""")
+        per_transcriber_count = cur.fetchall()
+        cur.execute("""SELECT COUNT(*) FROM transcriptions WHERE transcription != ''; """)
+        number_with_transcriptions = cur.fetchall()
+        cur.execute("""SELECT COUNT(*) FROM transcriptions WHERE marked_illegible = 1""")
+        number_marked_illegible = cur.fetchall()
+        cur.execute("""SELECT COUNT(*) FROM transcriptions WHERE marked_blank = 1""")
+        number_marked_blank = cur.fetchall()
+        return seg_passes, year_counts, per_transcriber_count, number_with_transcriptions, number_marked_illegible, number_marked_blank
+
+
+def make_transcriptions_csv():
+    with sqlite3.connect(DB) as con:
+        cur = con.cursor()
+        cur.execute("""PRAGMA table_info('segments')""")
+        seg_cols = cur.fetchall()
+        seg_cols = [i[1] for i in seg_cols]
+        cur.execute("""PRAGMA table_info('transcriptions')""")
+        transcriptions_cols = cur.fetchall()
+        transcriptions_cols = [i[1] for i in transcriptions_cols]
+        cur.execute("""PRAGMA table_info('user_stroke_coordinates')""")
+        stroke_cols = cur.fetchall()
+        stroke_cols = [i[1] for i in stroke_cols]
+        all_cols = transcriptions_cols + seg_cols + stroke_cols
+        cur.execute("""SELECT * FROM transcriptions LEFT JOIN segments ON transcriptions.segment_id = segments.segment_id LEFT JOIN user_stroke_coordinates ON transcriptions.segment_id = user_stroke_coordinates.record_id""")
+        rows = cur.fetchall()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(all_cols)
+        for row in rows:
+            writer.writerow(list(row))
+        output.seek(0)
+        return output

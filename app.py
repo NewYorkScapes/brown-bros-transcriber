@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, url_for, flash, redirect, abort, Markup
+from flask import Flask, render_template, request, session, url_for, flash, redirect, abort, Markup, Response
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_mail import Mail
 from werkzeug.security import generate_password_hash
@@ -9,7 +9,8 @@ import sys
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
-    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw, check_unique_token
+    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw, check_unique_token, \
+    make_report, make_transcriptions_csv
 from utils.emailer import send_reset_email, build_reset_pw
 from models import LoginForm, RegistrationForm, ResetForm, User, \
     ResetRequestForm, ResetFormForgot
@@ -31,6 +32,10 @@ app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 mail = Mail(app)
 
 
+"""
+Main Routes
+"""
+
 @app.route('/')
 def home():
     return render_template("home.html")
@@ -39,6 +44,31 @@ def home():
 @app.route('/narrative')
 def narrative():
     return render_template("narrative.html")
+
+
+@app.route('/system-admin', methods = ['GET'])
+@login_required
+def system_admin():
+    user = User(session.get('user_transcriber', None))
+    if not user.is_admin(1):
+        return abort(403)
+    seg_passes, year_counts, per_transcriber_count, number_with_transcriptions, number_marked_illegible, number_marked_blank = make_report()
+    return render_template("system.html", seg_passes = seg_passes,
+                           year_counts = year_counts,
+                           per_transcriber_count = per_transcriber_count,
+                           number_with_transcriptions = number_with_transcriptions,
+                           number_marked_illegible = number_marked_illegible,
+                           number_marked_blank = number_marked_blank)
+
+
+@app.route('/transcription-report', methods = ['GET'])
+@login_required
+def transcription_report():
+    user = User(session.get('user_transcriber', None))
+    if not user.is_admin(1):
+        return abort(403)
+    output = make_transcriptions_csv()
+    return Response(output, mimetype="text/csv", headers={"Content-Disposition":"attachment;filename=transcriptions_report.csv"})
 
   
 """
@@ -112,7 +142,7 @@ def register_page():
             return render_template('register.html', form=form, alert=True)
 
         else:
-            add_user = set_user(email, password)
+            add_user = set_user(email, password, 0)
             if add_user:
                 flash(Markup(
                     """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
@@ -141,7 +171,7 @@ def login():
 
                 next = request.args.get('next')
                 if next not in ['', 'transcriber']:
-                    return abort(400)
+                    return abort(403)
                 flash(Markup(
                     """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
                     'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
@@ -217,7 +247,8 @@ def reset_page():
 @login_required
 def profile():
     email = User(session.get('user_transcriber', None)).email
-    return render_template("profile.html", account_email=email)
+    role = str(User(session.get('user_transcriber', None)).access)
+    return render_template("profile.html", account_email=email, role=role)
 
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
@@ -304,7 +335,29 @@ def reset_forgot():
         return render_template('reset_forgot.html', form=form, reset_email=in_email, next=sent_unique_token)
 
     else:
-        return abort(400)
+        return abort(403)
+
+"""
+Error handlers
+"""
+
+@app.errorhandler(404)
+def page_not_found(e):
+    flash("Page not found.")
+    return render_template('general_use_template.html', title_text = "404 Error"), 404
+
+
+@app.errorhandler(403)
+def forbidden_page(e):
+    flash("User is not authorized to access this page.")
+    return render_template('general_use_template.html', title_text = "403 Error"), 403
+
+
+@app.errorhandler(500)
+def page_error(e):
+    flash("Page error. Please try again.")
+    return render_template('general_use_template.html', title_text = "500 Error"), 500
+
 
 if __name__ == '__main__':
     app.run(debug = DEBUG)

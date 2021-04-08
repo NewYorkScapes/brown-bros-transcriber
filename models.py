@@ -59,6 +59,10 @@ class User(UserMixin):
         self.id = str(user_info[0][0])
         self.email = user_info[0][1]
         self.password_hash = user_info[0][2]
+        self.access = user_info[0][3]
+
+    def is_admin(self, access_level):
+        return self.access == access_level
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
