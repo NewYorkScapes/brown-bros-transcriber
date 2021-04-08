@@ -1,3 +1,4 @@
+from flask import Markup
 from flask_login import UserMixin
 from wtforms import Form, BooleanField, TextField, StringField, PasswordField, SubmitField
 from wtforms.validators import Required, DataRequired, Email, EqualTo, Length
@@ -10,8 +11,12 @@ Login/User Classes
 """
 
 class LoginForm(Form):
-    email = StringField('Email', [Email(message="Please enter a valid email address."), DataRequired(), Length(max=120)])
+    email = TextField('Email', [Email(message="Please enter a valid email address."), DataRequired()])
     password = PasswordField('Password', [DataRequired()])
+
+
+class ResetRequestForm(Form):
+    email = TextField('Email', [Email(message="Please enter the email address associated with your account. If it matches one in our system, a reset email will be sent."), DataRequired()])
 
 
 class RegistrationForm(Form):
@@ -22,12 +27,21 @@ class RegistrationForm(Form):
         EqualTo('confirm', message='Passwords must match.')
     ])
     confirm = PasswordField('Repeat Password')
-    accept_tos = BooleanField('I agree to the data use policy.', [Required()])
+    accept_tos = BooleanField(Markup('I agree to the <a data-toggle="modal" href="#data_use_Modal">data use policy</a>.'), [Required()])
 
 
 class ResetForm(Form):
     email = TextField('Email Address', [Email(message="Please enter a valid email address"), DataRequired()])
     password = PasswordField('Current Password', [DataRequired()])
+    new_password = PasswordField('New Password', [
+        DataRequired(),
+        Length(min=8, message='Password should be at least %(min)d characters long.'),
+        EqualTo('confirm', message='Passwords must match.')
+    ])
+    confirm = PasswordField('Repeat Password')
+
+
+class ResetFormForgot(Form):
     new_password = PasswordField('New Password', [
         DataRequired(),
         Length(min=8, message='Password should be at least %(min)d characters long.'),
@@ -45,6 +59,10 @@ class User(UserMixin):
         self.id = str(user_info[0][0])
         self.email = user_info[0][1]
         self.password_hash = user_info[0][2]
+        self.access = user_info[0][3]
+
+    def is_admin(self, access_level):
+        return self.access == access_level
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

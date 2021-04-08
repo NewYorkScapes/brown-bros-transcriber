@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, session, url_for, flash, redirect, abort, Markup
+from flask import Flask, render_template, request, session, url_for, flash, redirect, abort, Markup, Response
 from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_mail import Mail
 from werkzeug.security import generate_password_hash
 import os
 import sys
@@ -8,9 +9,14 @@ import sys
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
 from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
-    retrieve_user, set_user, update_user
-from models import LoginForm, RegistrationForm, ResetForm, User
-from settings_local import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG
+    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw, check_unique_token, \
+    make_report, make_transcriptions_csv
+from utils.emailer import send_reset_email, build_reset_pw
+from models import LoginForm, RegistrationForm, ResetForm, User, \
+    ResetRequestForm, ResetFormForgot
+from settings import APP_SECRET_KEY, SEGMENT_DIR, CONTEXT_DIR, DEBUG, \
+                    MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_USERNAME,\
+                    MAIL_PASSWORD
 
 app = Flask(__name__)
 application = app
@@ -18,7 +24,17 @@ app.secret_key = APP_SECRET_KEY
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
+app.config['MAIL_SERVER'] = MAIL_SERVER
+app.config['MAIL_PORT'] = MAIL_PORT
+app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+mail = Mail(app)
 
+
+"""
+Main Routes
+"""
 
 @app.route('/')
 def home():
@@ -28,6 +44,31 @@ def home():
 @app.route('/narrative')
 def narrative():
     return render_template("narrative.html")
+
+
+@app.route('/system-admin', methods = ['GET'])
+@login_required
+def system_admin():
+    user = User(session.get('user_transcriber', None))
+    if not user.is_admin(1):
+        return abort(403)
+    seg_passes, year_counts, per_transcriber_count, number_with_transcriptions, number_marked_illegible, number_marked_blank = make_report()
+    return render_template("system.html", seg_passes = seg_passes,
+                           year_counts = year_counts,
+                           per_transcriber_count = per_transcriber_count,
+                           number_with_transcriptions = number_with_transcriptions,
+                           number_marked_illegible = number_marked_illegible,
+                           number_marked_blank = number_marked_blank)
+
+
+@app.route('/transcription-report', methods = ['GET'])
+@login_required
+def transcription_report():
+    user = User(session.get('user_transcriber', None))
+    if not user.is_admin(1):
+        return abort(403)
+    output = make_transcriptions_csv()
+    return Response(output, mimetype="text/csv", headers={"Content-Disposition":"attachment;filename=transcriptions_report.csv"})
 
   
 """
@@ -101,10 +142,12 @@ def register_page():
             return render_template('register.html', form=form, alert=True)
 
         else:
-            add_user = set_user(email, password)
+            add_user = set_user(email, password, 0)
             if add_user:
-                flash("Thanks for registering!")
-                return transcribe_segment()
+                flash(Markup(
+                    """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                    'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                return render_template('general_use_template.html', title_text="Thanks for registering!")
             else:
                 flash("An error occurred in registration. Please try again.")
                 return render_template('register.html', form=form)
@@ -128,8 +171,11 @@ def login():
 
                 next = request.args.get('next')
                 if next not in ['', 'transcriber']:
-                    return abort(400)
-                return home()
+                    return abort(403)
+                flash(Markup(
+                    """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                    'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                return render_template('general_use_template.html', title_text = "Login successful!" )
             else:
                 flash("Incorrect password. Please try again.")
                 return render_template('login.html', form=form)
@@ -179,8 +225,8 @@ def reset_page():
 
                 change_user = update_user(email, new_password)
                 if change_user:
-                    flash(Markup("""Password succesfully updated! <br/><br/><a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
-                    return render_template('reset.html', form=form)
+                    flash(Markup    ("""<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for('transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+                    return render_template('general_use_template.html', title_text="Password succesfully updated!")
 
                 else:
                     flash("An error occurred in updating password. Please try again.")
@@ -201,7 +247,116 @@ def reset_page():
 @login_required
 def profile():
     email = User(session.get('user_transcriber', None)).email
-    return render_template("profile.html", account_email=email)
+    role = str(User(session.get('user_transcriber', None)).access)
+    return render_template("profile.html", account_email=email, role=role)
+
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    form = ResetRequestForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        email = form.email.data.lower()
+
+        if retrieve_user(email=email) != False:
+            temp_pw, expire_date, unique_token = build_reset_pw()
+            if set_reset_pw(email, generate_password_hash(temp_pw), expire_date, 0, unique_token):
+                send_reset_email(email, temp_pw, mail, unique_token)
+                flash("A temporary password has been sent to your email address. Please check your email and enter the password below.")
+                return redirect(url_for('forgot_password_check', reset_email=email, next=unique_token))
+            else:
+                flash("An error occurred in sending a temporary password. Please try again.")
+                return render_template('forgot_password.html', form=form)
+        else:
+           flash("Email not found. Please try again.")
+           return render_template('forgot_password.html', form=form)
+
+    return render_template('forgot_password.html', form=form)
+
+
+@app.route('/forgot_password_check', methods=['GET', 'POST'])
+def forgot_password_check():
+    try:
+        in_email = request.args.get('reset_email').replace('%40','@')
+        sent_unique_token = request.args.get('next')
+        let_pass = check_unique_token(in_email, sent_unique_token)
+    except:
+        flash("A password reset is not available.")
+        return render_template('general_use_template.html', title_text="Error in resetting password.")
+    form = LoginForm(request.form, email=in_email)
+
+    if request.method == "POST" and let_pass == True:
+        user_email = form.email.data.lower()
+        message = check_reset_pw(user_email, form.password.data)
+        if message == True:
+            return redirect(url_for('reset_forgot', next=sent_unique_token, reset_email=user_email))
+
+        else:
+            flash(message)
+            if "incorrect" in message:
+                return redirect(url_for('forgot_password_check', next=sent_unique_token, reset_email=user_email))
+            return redirect(url_for('forgot_password'))
+
+    """
+    Initial arrival at reset password site. Since this page is not login/password protected, we don't allow anyone to direct access the page as a GET
+    without having the correct unique_token attached to the user's email's reset password. 
+    """
+    if let_pass:
+        return render_template('temp_reset_login.html', form=form, next=sent_unique_token, reset_email=in_email)
+
+
+@app.route('/reset_forgot', methods=['GET', 'POST'])
+def reset_forgot():
+    try:
+        in_email = request.args.get('reset_email').replace('%40','@')
+        sent_unique_token = request.args.get('next')
+        let_pass = check_unique_token(in_email, sent_unique_token)
+    except:
+        flash("Password reset was not successful. Please try again.")
+        return render_template('general_use_template.html', title_text="Error in resetting password.")
+
+    form = ResetFormForgot(request.form)
+
+
+    if request.method == "POST" and form.validate():
+        new_password = generate_password_hash(form.new_password.data)
+        change_user = update_user(in_email, new_password)
+        if change_user:
+            flash(Markup(
+                """<a class="btn btn-light btn-medium js-scroll-trigger" href=" """) + url_for(
+                'transcribe_segment') + Markup(""" ">Start Transcribing</a> """))
+            return render_template('general_use_template.html', title_text = "Password succesfully updated!")
+
+        else:
+            flash("An error occurred in updating password. Please try again.")
+            return render_template('reset_forgot.html', form=form, reset_email=user_email, next=sent_unique_token)
+
+    if let_pass:
+        return render_template('reset_forgot.html', form=form, reset_email=in_email, next=sent_unique_token)
+
+    else:
+        return abort(403)
+
+"""
+Error handlers
+"""
+
+@app.errorhandler(404)
+def page_not_found(e):
+    flash("Page not found.")
+    return render_template('general_use_template.html', title_text = "404 Error"), 404
+
+
+@app.errorhandler(403)
+def forbidden_page(e):
+    flash("User is not authorized to access this page.")
+    return render_template('general_use_template.html', title_text = "403 Error"), 403
+
+
+@app.errorhandler(500)
+def page_error(e):
+    flash("Page error. Please try again.")
+    return render_template('general_use_template.html', title_text = "500 Error"), 500
 
 
 if __name__ == '__main__':

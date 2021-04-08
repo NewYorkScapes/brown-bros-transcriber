@@ -1,0 +1,49 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+
+     <section class="page-section bg-primary" id="about">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Admin Page</h2>
+                        <hr class="divider my-4" style="padding-bottom: 1.5rem;" />
+                        <h3 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Transcription Passes Summary</h3>
+                        <table style="margin-left:auto;margin-right:auto;">
+                            <tr><th class="text-white mt-0" style="border: 1px solid #fff;">Number of Passes</th><th class="text-white mt-0" style="border: 1px solid #fff;">Count</th></tr>
+                            {%  for tr in seg_passes  %}
+                            <tr><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[0] }}</td><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[1] }}</td></tr>
+                            {% endfor %}
+                        </table>
+                        <br/>
+                        <h3 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Segments Being Transcribed by Year</h3>
+                        <table style="margin-left:auto;margin-right:auto;">
+                            <tr><th class="text-white mt-0" style="border: 1px solid #fff;">Year</th><th class="text-white mt-0" style="border: 1px solid #fff;">Count</th></tr>
+                            {%  for tr in year_counts  %}
+                            <tr><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[0] }}</td><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[1] }}</td></tr>
+                            {% endfor %}
+                        </table style="margin-left:auto;margin-right:auto;">
+                        <h3 class="text-white mt-0" style="padding-top: 2rem; padding-bottom: 1rem;">Transcriptions by User</h3>
+                        <table style="margin-left:auto;margin-right:auto;">
+                            <tr><th class="text-white mt-0" style="border: 1px solid #fff;">User</th><th class="text-white mt-0" style="border: 1px solid #fff;">Count</th></tr>
+                            {%  for tr in per_transcriber_count  %}
+                            <tr><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[0] }}</td><td class="text-white mt-0" style="border: 1px solid #fff;">{{ tr[1] }}</td></tr>
+                            {% endfor %}
+                        </table><br/>
+                        <p class="text-white mt-0">Number of segments given transcription: {{ number_with_transcriptions[0][0] }}</p>
+                        <p class="text-white mt-0">Number of marked illegible: {{ number_marked_illegible[0][0] }}</p>
+                        <p class="text-white mt-0">Number of marked blank: {{ number_marked_blank[0][0] }}</p>
+                        <br/><br/>
+                        <p><a href="{{ url_for('transcription_report') }}">Download All Transcriptions</a></p>
+                        {% for mesg in get_flashed_messages() %}
+                        <div class="alert-messages"><p>{{ mesg }}</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+     </section>
+
+{% include "footer.html" %}
+
+{% endblock %}

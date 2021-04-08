@@ -8,6 +8,8 @@
     <!-- Markup JS handler -->
     <script type="text/javascript" src="https://unpkg.com/markerjs2/markerjs2.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='markup_handler.js')}}"></script>
+    <!-- Special Character Insert JS handler -->
+    <script type="text/javascript" src="{{url_for('static', filename='special_character.js')}}"></script>
 
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="../static/assets/img/favicon.ico" />
@@ -47,6 +49,9 @@
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="mailto:info@newyorkscapes.org">Contact Us</a></li>
                         {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('profile') }}">Account Info</a></li>
+                        {%  endif %}
+                        {% if current_user.is_authenticated and current_user.is_admin(1) %}
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('system_admin') }}">Admin Page</a></li>
                         {%  endif %}
 
                     </ul>
