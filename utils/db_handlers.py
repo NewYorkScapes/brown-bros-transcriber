@@ -54,7 +54,6 @@ def retrieve_user(email=False, user_id=False):
             else:
                 cur.execute("""SELECT * FROM users WHERE user_id = ?""", (user_id,))
             rows = cur.fetchall()
-            print("Retrieve user is finding: ", rows)
             return rows
     except:
         con.rollback()
