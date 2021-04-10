@@ -2,7 +2,7 @@ import sqlite3
 import io
 import csv
 from random import random
-from settings import DB
+from settings_local import DB
 from werkzeug.security import check_password_hash
 from utils.emailer import check_if_expired
 
