@@ -25,7 +25,7 @@ def record_transcription(transcription, if_illegible, if_blank, row_num, user_tr
                           transcription, user_transcriber, 
                           marked_illegible, marked_blank) VALUES (?,?,?,?,?)""",(row_num, transcription, user_transcriber, if_illegible, if_blank) )
             #Set this back to number_passes + 1 when ready to go to production
-            cur.execute("""UPDATE segments SET number_passes = number_passes + 0 WHERE segment_id = ?""", (row_num,) )
+            cur.execute("""UPDATE segments SET number_passes = number_passes + 1 WHERE segment_id = ?""", (row_num,) )
             con.commit()
         return True
     except:
@@ -64,7 +64,7 @@ def set_user(email, password, access):
     try:
         with sqlite3.connect(DB) as con:
             cur = con.cursor()
-            cur.execute("""INSERT INTO users (email, password_hash, if_admin) VALUES (?,?,?)""",(email, password, access) )
+            cur.execute("""INSERT INTO users (email, password_hash, is_admin) VALUES (?,?,?)""",(email, password, access) )
             con.commit()
         return True
     except:
