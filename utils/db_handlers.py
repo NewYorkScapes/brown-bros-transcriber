@@ -2,7 +2,7 @@ import sqlite3
 import io
 import csv
 from random import random
-from settings_local import DB
+from settings import DB
 from werkzeug.security import check_password_hash
 from utils.emailer import check_if_expired
 
@@ -54,7 +54,8 @@ def retrieve_user(email=False, user_id=False):
             else:
                 cur.execute("""SELECT * FROM users WHERE user_id = ?""", (user_id,))
             rows = cur.fetchall()
-        return rows
+            print("Retrieve user is finding: ", rows)
+    return rows
     except:
         con.rollback()
         return False
@@ -64,12 +65,12 @@ def set_user(email, password, access):
     try:
         with sqlite3.connect(DB) as con:
             cur = con.cursor()
-            cur.execute("""INSERT INTO users (email, password_hash, admin) VALUES (?,?,?)""",(email, password, access) )
+            cur.execute("""INSERT INTO users (email, password_hash, is_admin) VALUES (?,?,?)""",(email, password, access) )
             con.commit()
         return True
     except:
-        con.rollback()
-        return False
+       con.rollback()
+       return False
 
 
 def update_user(email, password):
