@@ -64,7 +64,7 @@ def set_user(email, password, access):
     try:
         with sqlite3.connect(DB) as con:
             cur = con.cursor()
-            cur.execute("""INSERT INTO users (email, password_hash, is_admin) VALUES (?,?,?)""",(email, password, access) )
+            cur.execute("""INSERT INTO users (email, password_hash, admin) VALUES (?,?,?)""",(email, password, access) )
             con.commit()
         return True
     except:
