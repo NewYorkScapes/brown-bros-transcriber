@@ -8,7 +8,7 @@ def send_reset_email(user_email, reset_code, mail, unique_token):
     msg = Message()
     msg.subject = "Transcriber Account"
     msg.recipients = [user_email]
-    msg.sender = 'do-not-reply@newyorkscapes.org'
+    msg.sender = 'info.newyorkscapes@gmail.com'
     message_html = """
                 <p>You are receiving this email because you requested to change your account login</p>
                 <p>To reset your password please <a href="https://brownbros.newyorkscapes.org/forgot_password_check?next={0}&reset_email={1}">login</a> using the following temporary credentials:</p>
