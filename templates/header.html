@@ -31,27 +31,27 @@
   <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
             <div class="container">
-                <a class="navbar-brand js-scroll-trigger" href="{{ url_for('home') }}">Brown Brothers Transcriber</a>
+                <a class="navbar-brand js-scroll-trigger" href="{{ url_for('home') }}">Brown Brothers Collection Transcription Project</a>
 
                 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
 
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="menu navbar-nav ml-auto my-2 my-lg-0">
                         {% if not current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger" href="{{ url_for('register_page') }}">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('login') }}">Log In</a></li>
+                        <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger text-nowrap" href="{{ url_for('register_page') }}">Sign Up</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="{{ url_for('login') }}">Log In</a></li>
                         {%  endif %}
                         {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger" href="{{ url_for('logout') }}">Sign Out</a></li>
+                        <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger text-nowrap" href="{{ url_for('logout') }}">Sign Out</a></li>
                         {%  endif %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="https://newyorkscapes.org/brownbrothers/" target="_blank">About the Project</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('narrative') }}">Why Transcribe?</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="mailto:info@newyorkscapes.org">Contact Us</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="https://newyorkscapes.org/brownbrothers/" target="_blank">About the Project</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="{{ url_for('narrative') }}">Why Transcribe?</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="mailto:info.newyorkscapes@gmail.com">Contact Us</a></li>
                         {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('profile') }}">Account Info</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="{{ url_for('profile') }}">Account Info</a></li>
                         {%  endif %}
                         {% if current_user.is_authenticated and current_user.is_admin(1) %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('system_admin') }}">Admin Page</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger text-nowrap" href="{{ url_for('system_admin') }}">Admin Page</a></li>
                         {%  endif %}
 
                     </ul>

@@ -294,6 +294,11 @@ input[type=checkbox] {
   padding: 0;
 }
 
+input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+}
+
 textarea {
   overflow: auto;
   resize: vertical;
@@ -10027,7 +10032,7 @@ hr.light {
 }
 
 .page-section {
-  padding: 8rem 0;
+  padding: 6rem 0;
 }
 
 #mainNav {

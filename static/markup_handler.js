@@ -3,6 +3,7 @@ function showMarkerArea(target) {
   const markerArea = new markerjs2.MarkerArea(target);
   markerArea.availableMarkerTypes = ['LineMarker'];
   markerArea.addRenderEventListener((imgURL, state) => {target.src = imgURL; imageSave = state;});
+  markerjs2.Activator.addKey("MJS2-P716-S898-1236");
   markerArea.show();
   var strokeVals = imageSave['markers'];
   var all_vals = "";

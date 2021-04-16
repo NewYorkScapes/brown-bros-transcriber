@@ -247,8 +247,9 @@ def reset_page():
 @login_required
 def profile():
     email = User(session.get('user_transcriber', None)).email
+    roles = {"0":"User", "1":"Admin"}
     role = str(User(session.get('user_transcriber', None)).access)
-    return render_template("profile.html", account_email=email, role=role)
+    return render_template("profile.html", account_email=email, role=roles[role])
 
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
