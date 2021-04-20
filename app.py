@@ -52,13 +52,18 @@ def system_admin():
     user = User(session.get('user_transcriber', None))
     if not user.is_admin(1):
         return abort(403)
-    seg_passes, year_counts, per_transcriber_count, number_with_transcriptions, number_marked_illegible, number_marked_blank = make_report()
-    return render_template("system.html", seg_passes = seg_passes,
-                           year_counts = year_counts,
-                           per_transcriber_count = per_transcriber_count,
-                           number_with_transcriptions = number_with_transcriptions,
-                           number_marked_illegible = number_marked_illegible,
-                           number_marked_blank = number_marked_blank)
+    try:
+        seg_passes, year_counts, per_transcriber_count, number_with_transcriptions, number_marked_illegible, number_marked_blank = make_report()
+        return render_template("system.html", seg_passes=seg_passes,
+                               year_counts=year_counts,
+                               per_transcriber_count=per_transcriber_count,
+                               number_with_transcriptions=number_with_transcriptions,
+                               number_marked_illegible=number_marked_illegible,
+                               number_marked_blank=number_marked_blank)
+    except:
+        flash("There was an error in retrieving system info.")
+        return render_template('general_use_template.html', title_text="An Error Occurred.")
+
 
 
 @app.route('/transcription-report', methods = ['GET'])
@@ -68,8 +73,11 @@ def transcription_report():
     if not user.is_admin(1):
         return abort(403)
     output = make_transcriptions_csv()
-    return Response(output, mimetype="text/csv", headers={"Content-Disposition":"attachment;filename=transcriptions_report.csv"})
-
+    if output != False:
+        return Response(output, mimetype="text/csv", headers={"Content-Disposition":"attachment;filename=transcriptions_report.csv"})
+    else:
+        flash("There was an error in retrieving system info.")
+        return render_template('general_use_template.html', title_text="An Error Occurred.")
   
 """
 TRANSCRIPTION MANAGEMENT ROUTES
@@ -79,7 +87,7 @@ TRANSCRIPTION MANAGEMENT ROUTES
 @login_required
 def transcribe_segment():
     new_segments = fetch_new_segment()
-    if new_segments != None:
+    if new_segments != False:
         segment_filename, session['current_row_id'], context_filename = new_segments[0], new_segments[1], new_segments[2]
         current_image = os.path.join(SEGMENT_DIR, segment_filename)
         context_image = os.path.join(CONTEXT_DIR, context_filename)
