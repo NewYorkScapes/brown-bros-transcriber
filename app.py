@@ -46,6 +46,11 @@ def narrative():
     return render_template("narrative.html")
 
 
+@app.route('/team')
+def team():
+    return render_template("team.html")
+
+
 @app.route('/system-admin', methods = ['GET'])
 @login_required
 def system_admin():
@@ -65,7 +70,6 @@ def system_admin():
         return render_template('general_use_template.html', title_text="An Error Occurred.")
 
 
-
 @app.route('/transcription-report', methods = ['GET'])
 @login_required
 def transcription_report():
@@ -78,7 +82,8 @@ def transcription_report():
     else:
         flash("There was an error in retrieving system info.")
         return render_template('general_use_template.html', title_text="An Error Occurred.")
-  
+
+
 """
 TRANSCRIPTION MANAGEMENT ROUTES
 """
@@ -93,11 +98,20 @@ def transcribe_segment():
         context_image = os.path.join(CONTEXT_DIR, context_filename)
         return render_template('segment_transcription_page.html', image_url = current_image, context_url = context_image)
     flash("No segments currently available to transcribe.")
-    return render_template("thanks.html")
+    return render_template('general_use_template.html', title_text="An error occurred.")
 
 
 @app.route('/addrec',methods = ['POST', 'GET'])
 def addrec():
+    try:
+        user_id_available_test = int(session.get('user_transcriber', None))
+    except:
+        """
+        User's transcriber ID must have expired from session, we need to prompt a new login
+        """
+        flash("Session expired. Please login again.")
+        form = LoginForm(request.form)
+        return render_template('login.html', form=form)
     try:
         if_illegible = 1 if request.form['illegible'] == "True" else 0
     except:
@@ -120,11 +134,8 @@ def addrec():
         for stroke_coords in list_stroke_coords:
             insert_row = tuple([i for i in stroke_coords.split('-')] + [session.get('current_row_id', None),session.get('user_transcriber', None)],)
             strokes_success = record_user_strokes(insert_row)
-            if strokes_success:
-                flash("Success recording segments separation.")
-            else:
-                flash("Error in recording segments separation.")
-    return render_template("thanks.html")
+    return transcribe_segment()
+
 
 
 """
@@ -228,7 +239,7 @@ def reset_page():
         new_password = generate_password_hash(form.new_password.data)
 
         user = User(email)
-        if user:
+        if user.user_found:
             if user.check_password(form.password.data):
 
                 change_user = update_user(email, new_password)
@@ -254,11 +265,17 @@ def reset_page():
 @app.route('/profile', methods=["GET"])
 @login_required
 def profile():
-    email = User(session.get('user_transcriber', None)).email
-    roles = {"0":"User", "1":"Admin"}
-    role = str(User(session.get('user_transcriber', None)).access)
-    return render_template("profile.html", account_email=email, role=roles[role])
-
+    try:
+        email = User(session.get('user_transcriber', None)).email
+        roles = {"0":"User", "1":"Admin"}
+        role = str(User(session.get('user_transcriber', None)).access)
+        return render_template("profile.html", account_email=email, role=roles[role])
+    except:
+        """
+        If user fails to be retrieved because user_transcriber ID has expired, send back to login
+        """
+        form = LoginForm(request.form)
+        return render_template('login.html', form=form)
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():

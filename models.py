@@ -56,10 +56,14 @@ class User(UserMixin):
             user_info = retrieve_user(email=email_or_user_id)
         else:
             user_info = retrieve_user(user_id=email_or_user_id)
-        self.id = str(user_info[0][0])
-        self.email = user_info[0][1]
-        self.password_hash = user_info[0][2]
-        self.access = user_info[0][3]
+        if user_info != False:
+            self.user_found = True
+            self.id = str(user_info[0][0])
+            self.email = user_info[0][1]
+            self.password_hash = user_info[0][2]
+            self.access = user_info[0][3]
+        else:
+            self.user_found = False
 
     def is_admin(self, access_level):
         return self.access == access_level

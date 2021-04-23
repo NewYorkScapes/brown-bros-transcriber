@@ -32,25 +32,27 @@
                         {% from "_formhelpers.html" import render_field %}
 
                         <h3 class="text-white mt-0">2. Enter transcription:</h3>
-                        <p class="text-white mt-0">If a special character is needed, click to insert:</p>
-                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '½')" value="½" id="specialbutton" />
-                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '%')" value="%" id="specialbutton" />
-                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¼')" value="¼" id="specialbutton" />
-                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '£')" value="£" id="specialbutton" />
-                        <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¢')" value="¢" id="specialbutton" />
-                        <br/><br/>
                         <form action="{{ url_for('addrec') }}" method="POST">
 
-                             <input type="text" name="segment_transcription" id="text"/><br/><br/><br/>
-                             <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
-                            <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/><br/>
-                            <input type="checkbox" id="illegible" name="illegible" value="True">
-                             <label style="color: white;" for="illegible">Image has text but is all or partially illegible.</label><br/><br/>
-                             <input type="checkbox" id="blank" name="blank" value="True">
-                            <label style="color: white;" for="blank">Image is blank or does not contain text or numbers.</label><br/>
-                            <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit" />
-                        </form>
+                            <input type="text" name="segment_transcription" id="text"/><br/><br/>
+                            <p class="text-white mt-0">Click to insert special characters:</p>
+                            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '&')" value="&" id="specialbutton" />
+                            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '%')" value="%" id="specialbutton" />
+                            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '$')" value="$" id="specialbutton" />
+                            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '£')" value="£" id="specialbutton" />
+                            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¢')" value="¢" id="specialbutton" />
+                            <input type="button" style="padding:2px;" data-toggle="modal" href="#fractions" value="⅟..." />
 
+                            <input id="segmentcoords" type="hidden" name="segment_coords" value="" />
+                            <br/><br/><br/>
+                                <h3 class="text-white mt-0">3. Or select one of the following:</h3><br/><br/>
+                            <input type="checkbox" id="illegible" name="illegible" value="True">
+                                <label style="color: white;" for="illegible">Image has text but is all or partially illegible.</label><br/><br/>
+                            <input type="checkbox" id="blank" name="blank" value="True">
+                                <label style="color: white;" for="blank">Image is blank or does not contain text or numbers.</label><br/>
+                            <input class="btn btn-light btn-medium js-scroll-trigger" type="submit" value="Submit and Try Another" /><br/>
+                        </form>
+                        <a class="btn btn-light btn-medium js-scroll-trigger" href="{{ url_for('home') }}">Return Home</a>
                     </div>
                 </div>
             </div>
@@ -88,6 +90,41 @@
 
         <div class="modal-body">
             <img src="{{ context_url }}" class="img-responsive" style="align: center; max-width:100%;">
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fraction Menu Popup -->
+<div id="fractions" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5>Select a Fraction Character</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+
+        <div class="modal-body" style="display:grid; grid-template-columns: repeat(3, 1fr);">
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '½')" value="½" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¼')" value="¼" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '¾')" value="¾" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅓')" value="⅓" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅔')" value="⅔" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅕')" value="⅕" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅖')" value="⅖" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅗')" value="⅗" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅘')" value="⅘" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅙')" value="⅙" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅚')" value="⅚" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅛')" value="⅛" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅜')" value="⅜" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅝')" value="⅝" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅞')" value="⅞" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅐')" value="⅐" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅑')" value="⅑" id="specialbutton" data-dismiss="modal" />
+            <input type="button" style="padding:2px;" onclick="insertSpecial('text', '⅒')" value="⅒" id="specialbutton" data-dismiss="modal" />
         </div>
     </div>
   </div>
