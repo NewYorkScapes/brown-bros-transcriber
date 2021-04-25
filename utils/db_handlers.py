@@ -35,7 +35,6 @@ def record_transcription(transcription, if_illegible, if_blank, row_num, user_tr
             con.commit()
         return True
     except:
-        con.rollback()
         return False
     finally:
         con.close()
@@ -48,7 +47,6 @@ def record_user_strokes(id_plus_coords):
             con.commit()
         return True
     except:
-        con.rollback()
         return False
     finally:
         con.close()
@@ -78,7 +76,6 @@ def set_user(email, password, access):
             con.commit()
         return True
     except:
-       con.rollback()
        return False
     finally:
         con.close()
@@ -92,7 +89,6 @@ def update_user(email, password):
             con.commit()
         return True
     except:
-        con.rollback()
         return False
     finally:
         con.close()
@@ -106,7 +102,6 @@ def set_reset_pw(user_email, temp_pw, expire_date, if_used, unique_token):
             con.commit()
         return True
     except:
-        con.rollback()
         return False
     finally:
         con.close()
