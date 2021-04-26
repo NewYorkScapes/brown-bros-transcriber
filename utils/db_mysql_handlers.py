@@ -83,13 +83,13 @@ def make_transcriptions_csv():
     try:
         with connect(**CONFIG) as con:
             cur = con.cursor()
-            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = CONFIG['database'] AND TABLE_NAME = 'segments'""")
+            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'segments'""", (CONFIG['database'],))
             seg_cols = cur.fetchall()
             seg_cols = [i for i in list(seg_cols[0])[0].split(',')]
-            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = CONFIG['database'] AND TABLE_NAME = 'transcriptions'""")
+            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'transcriptions'""", (CONFIG['database'],))
             transcriptions_cols = cur.fetchall()
             transcriptions_cols = [i for i in list(transcriptions_cols[0])[0].split(',')]
-            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = CONFIG['database'] AND TABLE_NAME = 'user_stroke_coordinates'""")
+            cur.execute("""SELECT group_concat(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'user_stroke_coordinates'""", (CONFIG['database'],))
             stroke_cols = cur.fetchall()
             stroke_cols = [i for i in list(stroke_cols[0])[0].split(',')]
             all_cols = transcriptions_cols + seg_cols + stroke_cols
