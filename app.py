@@ -8,8 +8,9 @@ import sys
 
 sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
-from utils.db_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
-    retrieve_user, set_user, update_user, set_reset_pw, check_reset_pw, check_unique_token, \
+from utils.db_handlers import retrieve_user, set_user, update_user, set_reset_pw, \
+    check_reset_pw, check_unique_token
+from utils.db_mysql_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
     make_report, make_transcriptions_csv
 from utils.emailer import send_reset_email, build_reset_pw
 from models import LoginForm, RegistrationForm, ResetForm, User, \
@@ -125,7 +126,6 @@ def addrec():
         if_blank = 1 if request.form['blank'] == "True" else 0
     except:
         if_blank = 0
-
     recorded_success = record_transcription(request.form['segment_transcription'],
                                     if_illegible, if_blank,
                                     session.get('current_row_id', None),
