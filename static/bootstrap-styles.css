@@ -1989,6 +1989,7 @@ pre code {
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .form-control {
     transition: none;
@@ -10151,7 +10152,7 @@ hr.light {
 
 header.masthead {
   padding-top: 10rem;
-  padding-bottom: calc(10rem - 4.5rem);
+  /* padding-bottom: calc(10rem - 4.5rem); */
   background: linear-gradient(to bottom, rgba(40, 38, 36, 0.8) 0%, rgba(40, 38, 36, 0.8) 100%), url("../static/assets/img/bg-masthead.jpg");
   background-color: red;
   background-position: center;
@@ -10162,6 +10163,15 @@ header.masthead {
 header.masthead h1 {
   font-size: 2.25rem;
 }
+
+.page-footer {
+  position: relative;
+  margin-top: -150px; /* negative value of footer height */
+  height: 150px;
+  clear:both;
+  padding-top:20px;
+}
+
 @media (min-width: 992px) {
   header.masthead {
     height: 100vh;
