@@ -10,8 +10,7 @@ sys.path.insert(0, '/newyorks/brownbros.newyorkscapes.org/')
 
 from utils.db_handlers import retrieve_user, set_user, update_user, set_reset_pw, \
     check_reset_pw, check_unique_token
-from utils.db_mysql_handlers import fetch_new_segment, record_transcription, record_user_strokes, \
-    make_report, make_transcriptions_csv
+from utils.db_mysql_handlers import *
 from utils.emailer import send_reset_email, build_reset_pw
 from models import LoginForm, RegistrationForm, ResetForm, User, \
     ResetRequestForm, ResetFormForgot
@@ -134,6 +133,7 @@ def addrec():
                                     session.get('current_row_id', None),
                                     session.get('user_transcriber', None),
                                     set_done)
+
     if recorded_success:
         flash("Response successfully recorded.")
     else:

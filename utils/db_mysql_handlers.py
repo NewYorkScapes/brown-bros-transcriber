@@ -9,11 +9,11 @@ def fetch_new_segment():
     try:
         with connect(**CONFIG) as con:
             cur = con.cursor()
-            cur.execute("""SELECT * FROM segments WHERE matched_reached = 0""")
+            cur.execute("""SELECT * FROM segments WHERE match_reached = 0 AND number_passes < 4""")
             rows = cur.fetchall()
             random_row = int(random()*len(rows))
             if len(rows) > 0:
-                return rows[random_row][0], rows[random_row][5], rows[random_row][10]
+                return rows[random_row][0], rows[random_row][5], rows[random_row][11]
             return False
     except:
         return False
@@ -29,7 +29,7 @@ def test_match(transcription, row_num):
             cur.execute("""SELECT transcription FROM transcriptions WHERE segment_id = %s""", (row_num,))
             rows = cur.fetchall()
             match_exists = False
-            if len(rows) > 1:
+            if len(rows) > 0:
                 for row in rows:
                     if row[0] == transcription:
                         match_exists = True
