@@ -126,10 +126,14 @@ def addrec():
         if_blank = 1 if request.form['blank'] == "True" else 0
     except:
         if_blank = 0
+
+    set_done = test_match(request.form['segment_transcription'], session.get('current_row_id', None))
+
     recorded_success = record_transcription(request.form['segment_transcription'],
                                     if_illegible, if_blank,
                                     session.get('current_row_id', None),
-                                    session.get('user_transcriber', None))
+                                    session.get('user_transcriber', None),
+                                    set_done)
     if recorded_success:
         flash("Response successfully recorded.")
     else:

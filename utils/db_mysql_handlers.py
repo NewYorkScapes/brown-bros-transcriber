@@ -9,7 +9,7 @@ def fetch_new_segment():
     try:
         with connect(**CONFIG) as con:
             cur = con.cursor()
-            cur.execute("""SELECT * FROM segments WHERE number_passes < 3""")
+            cur.execute("""SELECT * FROM segments WHERE matched_reached = 0""")
             rows = cur.fetchall()
             random_row = int(random()*len(rows))
             if len(rows) > 0:
@@ -22,7 +22,25 @@ def fetch_new_segment():
         con.close()
 
 
-def record_transcription(transcription, if_illegible, if_blank, row_num, user_transcriber):
+def test_match(transcription, row_num):
+    try:
+        with connect(**CONFIG) as con:
+            cur = con.cursor()
+            cur.execute("""SELECT transcription FROM transcriptions WHERE segment_id = %s""", (row_num,))
+            rows = cur.fetchall()
+            match_exists = False
+            if len(rows) > 1:
+                for row in rows:
+                    if row[0] == transcription:
+                        match_exists = True
+            return match_exists
+    except:
+        return False
+    finally:
+        cur.close()
+        con.close()
+
+def record_transcription(transcription, if_illegible, if_blank, row_num, user_transcriber, set_done):
     try:
         with connect(**CONFIG) as con:
             cur = con.cursor()
@@ -31,7 +49,10 @@ def record_transcription(transcription, if_illegible, if_blank, row_num, user_tr
                           marked_illegible, marked_blank) VALUES (%s,%s,%s,%s,%s)""",(row_num, transcription, user_transcriber, if_illegible, if_blank) )
             con.commit()
             #Set this back to number_passes + 1 when ready to go to production
-            cur.execute("""UPDATE segments SET number_passes = number_passes + 1 WHERE segment_id = %s""", (row_num,) )
+            if set_done:
+                cur.execute("""UPDATE segments SET number_passes = number_passes + 1, match_reached = 1 WHERE segment_id = %s""", (row_num,) )
+            else:
+                cur.execute("""UPDATE segments SET number_passes = number_passes + 1 WHERE segment_id = %s""", (row_num,) )
             con.commit()
         return True
     except:
