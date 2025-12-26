@@ -44,7 +44,7 @@
                         {% if current_user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link-emphasis js-scroll-trigger" href="{{ url_for('logout') }}">Sign Out</a></li>
                         {%  endif %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="https://newyorkscapes.org/brownbrothers/" target="_blank">About the Project</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="https://newyorkscapes.org/brownbrothers/index.html" target="_blank">About the Project</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{{ url_for('narrative') }}">Why Transcribe?</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="mailto:info@newyorkscapes.org">Contact Us</a></li>
                         {% if current_user.is_authenticated %}
@@ -63,3 +63,4 @@
 
 {% block content %}
 {% endblock content %}
+
